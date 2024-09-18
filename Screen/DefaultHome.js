@@ -24,11 +24,14 @@ export default function DefaultHome() {
   return (
     <View style={styles.container}>
       <View style={styles.leftCorner}>
-        <Text style={styles.text}>Home</Text>
+        <Text style={{fontSize:35,marginBottom:5}}>Welcome</Text>
+        <Text style={{fontSize:25,fontWeight:'bold'}}>to</Text>
+        <Text style={styles.text}>CareConnect</Text>
       </View>
       
       <View style={styles.rightCorner}>
-        <CommonNavBtn 
+      <CommonNavBtn 
+      onPress={() => navigation.navigate("SignIn")}
        title='Sign In'
        style={{ marginVertical: 8 }}
        />
@@ -53,7 +56,7 @@ const styles = StyleSheet.create({
   },
   leftCorner: {
     position: 'absolute',
-    top: 20, 
+    top: 30, 
     left: 20, 
     zIndex: 1,
   },
@@ -71,7 +74,7 @@ const styles = StyleSheet.create({
     alignItems: 'baseline',
   },
   text: {
-    fontSize: 24,
+    fontSize: 40,
     fontWeight: 'bold',
   },
   button: {

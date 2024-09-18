@@ -6,6 +6,10 @@ import { createStackNavigator } from "@react-navigation/stack";
 import Onboarding from "./Onboarding/Onboarding";
 import DefaultHome from "./Screen/DefaultHome";
 import OnboardingContext from "./Onboarding/OnboardingContext";
+import { Provider } from "react-redux";
+import { SignIn } from "./Screen/Login";
+import {SignUp} from "./Screen/Login";
+import { store } from "./store/store";
 
 
 const Stack = createStackNavigator();
@@ -23,10 +27,13 @@ const OnboardingStack = () => (
 );
 
 const MainStack = () => (
-
+  <Provider store={store}>
   <Stack.Navigator screenOptions={{ headerShown: false }}>
     <Stack.Screen name="Default Home" component={DefaultHome} />
+    <Stack.Screen name="SignIn" component={SignIn} />
+    <Stack.Screen name="SignUp" component={SignUp} />
   </Stack.Navigator>
+  </Provider>
 );
 
 export default function App() {
