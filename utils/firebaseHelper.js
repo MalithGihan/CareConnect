@@ -10,13 +10,13 @@ export const getFirebaseApp = () => {
     }
 
     const firebaseConfig = {
-        apiKey: "AIzaSyDnEHAVhXE5Ptwp2N6FdMTtr4EC98zOR6c",
-        authDomain: "se-translator-a7b97.firebaseapp.com",
-        projectId: "se-translator-a7b97",
-        storageBucket: "se-translator-a7b97.appspot.com",
-        messagingSenderId: "747418139254",
-        appId: "1:747418139254:web:0d9ec146a0e54faf2efd57",
-        measurementId: "G-DHZXL89H4B"
+        apiKey: "AIzaSyAIHh6eD2AQ2_QseG48dGDubp8MgCDS1SM",
+        authDomain: "careconnect-bbec7.firebaseapp.com",
+        projectId: "careconnect-bbec7",
+        storageBucket: "careconnect-bbec7.appspot.com",
+        messagingSenderId: "479004028518",
+        appId: "1:479004028518:web:12d14e720d5487ae2a87a7",
+        measurementId: "G-FMB43FBLM7"
     };
 
     const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
@@ -29,3 +29,6 @@ export const getFirebaseApp = () => {
 
     return app;
 };
+
+
+

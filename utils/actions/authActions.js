@@ -13,7 +13,7 @@ import { getUserData } from "./userActions";
 import { clearAuth } from '../../store/authSlice';
 
 //Sign Up Hook
-export const signUp = (fullName, email, password,role) => {
+export const signUp = (userName, email, password,role) => {
   return async (dispatch) => {
     const app = getFirebaseApp();
     const auth = getAuth(app);
@@ -29,7 +29,7 @@ export const signUp = (fullName, email, password,role) => {
       const { accessToken, expirationTime } = stsTokenManager;
       const expiryDate = new Date(expirationTime);
 
-      const userData = await createUser(fullName, email,role, uid);
+      const userData = await createUser(userName, email,role, uid);
 
       dispatch(authenticate({ token: accessToken, userData }));
 
@@ -109,9 +109,9 @@ export const logout = async (dispatch, navigation) => {
 };
 
 
-const createUser = async (fullName, email,role, userId) => {
+const createUser = async (userName, email,role, userId) => {
   const userData = {
-    fullName,
+    userName,
     email,
     role,
     userId,
