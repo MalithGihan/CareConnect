@@ -31,7 +31,7 @@ export default function DefaultHome() {
       
       <View style={styles.rightCorner}>
       <CommonNavBtn 
-      onPress={() => navigation.navigate("SignIn")}
+      onPress={() => navigation.navigate("Sign In")}
        title='Sign In'
        style={{ marginVertical: 8 }}
        />

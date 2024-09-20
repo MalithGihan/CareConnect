@@ -10,11 +10,26 @@ import { signOut } from "firebase/auth";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { authenticate } from "../../store/authSlice";
 import { getUserData } from "./userActions";
-import { clearAuth } from '../../store/authSlice';
+import { clearAuth } from "../../store/authSlice";
 
 //Sign Up Hook
-export const signUp = (userName, email, password,role) => {
-  return async (dispatch) => {
+export const signUp =
+  (
+    userName,
+    email,
+    password,
+    role,
+    fullName,
+    phoneNumber,
+    address,
+    gender,
+    nic,
+    dateOfBrirth,
+    education,
+    hospital,
+    jobStart
+  ) =>
+  async (dispatch) => {
     const app = getFirebaseApp();
     const auth = getAuth(app);
 
@@ -22,14 +37,28 @@ export const signUp = (userName, email, password,role) => {
       const result = await createUserWithEmailAndPassword(
         auth,
         email,
-        password,
+        password
       );
 
       const { uid, stsTokenManager } = result.user;
       const { accessToken, expirationTime } = stsTokenManager;
       const expiryDate = new Date(expirationTime);
 
-      const userData = await createUser(userName, email,role, uid);
+      const userData = await createUser(
+        userName,
+        email,
+        role,
+        fullName,
+        phoneNumber,
+        address,
+        gender,
+        nic,
+        dateOfBrirth,
+        education,
+        hospital,
+        jobStart,
+        uid
+      );
 
       dispatch(authenticate({ token: accessToken, userData }));
 
@@ -40,18 +69,20 @@ export const signUp = (userName, email, password,role) => {
       const errorCode = error.code;
       let message = "Something went wrong";
 
-      if (errorCode === "auth/wrong-password" || errorCode === "auth/user-not-found") {
+      if (
+        errorCode === "auth/wrong-password" ||
+        errorCode === "auth/user-not-found"
+      ) {
         message = "Wrong email or password";
       }
 
-      if(errorCode === "auth/email-already-in-use"){
-        message = "Email already in use"
+      if (errorCode === "auth/email-already-in-use") {
+        message = "Email already in use";
       }
 
       throw new Error(message);
     }
   };
-};
 
 //Sign In Hook
 export const signIn = (email, password) => {
@@ -61,6 +92,7 @@ export const signIn = (email, password) => {
 
     try {
       const result = await signInWithEmailAndPassword(auth, email, password);
+
       const { uid, stsTokenManager } = result.user;
       const { accessToken, expirationTime } = stsTokenManager;
       const expiryDate = new Date(expirationTime);
@@ -76,14 +108,17 @@ export const signIn = (email, password) => {
       console.log(error);
 
       const errorCode = error.code;
-      let message = 'Something went wrong';
+      let message = "Something went wrong";
 
-      if (errorCode === 'auth/wrong-password' || errorCode === 'auth/user-not-found') {
-        message = 'Wrong email or password';
+      if (
+        errorCode === "auth/wrong-password" ||
+        errorCode === "auth/user-not-found"
+      ) {
+        message = "Wrong email or password";
       }
 
-      if (errorCode === 'auth/invalid-credential') {
-        message = 'Please check your email or password';
+      if (errorCode === "auth/invalid-credential") {
+        message = "Please check your email or password";
       }
 
       throw new Error(message);
@@ -91,38 +126,67 @@ export const signIn = (email, password) => {
   };
 };
 
-
-//logout 
+//logout
 export const logout = async (dispatch, navigation) => {
   const auth = getAuth();
 
   try {
     await signOut(auth);
-    await AsyncStorage.removeItem('userData');
+    await AsyncStorage.removeItem("userData");
 
     dispatch(clearAuth());
 
-    navigation.navigate('SignIn');
+    navigation.navigate("SignIn");
   } catch (error) {
-    console.error('Logout error:', error);
+    console.error("Logout error:", error);
   }
 };
 
-
-const createUser = async (userName, email,role, userId) => {
-  const userData = {
+const createUser = async (
+  userName,
+  email,
+  role,
+  fullName,
+  phoneNumber,
+  address,
+  gender,
+  nic,
+  dateOfBrirth,
+  education,
+  hospital,
+  jobStart,
+  userId
+) => {
+  let userData = {
     userName,
     email,
     role,
+    fullName,
+    phoneNumber,
+    address,
+    gender,
+    nic,
+    dateOfBrirth,
+    education,
+    hospital,
+    jobStart,
     userId,
     signUpDate: new Date().toISOString(),
   };
 
+  Object.keys(userData).forEach(key => {
+    if (userData[key] === undefined) {
+      delete userData[key];
+    }
+  });
+
   const dbRef = ref(getDatabase());
   const childRef = child(dbRef, `user/${userId}`);
   await set(childRef, userData);
+
   return userData;
 };
+
 
 const saveToDataStorage = (token, userId, expiryDate) => {
   AsyncStorage.setItem(

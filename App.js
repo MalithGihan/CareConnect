@@ -9,6 +9,9 @@ import OnboardingContext from "./Onboarding/OnboardingContext";
 import { Provider } from "react-redux";
 import { SignIn } from "./Screen/Login";
 import {SignUp} from "./Screen/Login";
+import HomeDoctor from "./Screen/Doctor/HomeDoctor";
+
+
 import { store } from "./store/store";
 
 
@@ -30,8 +33,9 @@ const MainStack = () => (
   <Provider store={store}>
   <Stack.Navigator screenOptions={{ headerShown: false }}>
     <Stack.Screen name="Default Home" component={DefaultHome} />
-    <Stack.Screen name="SignIn" component={SignIn} />
-    <Stack.Screen name="SignUp" component={SignUp} />
+    <Stack.Screen name="Sign In" component={SignIn} />
+    <Stack.Screen name="Sign Up" component={SignUp} />
+    <Stack.Screen name="Home Doctor" component={HomeDoctor} />
   </Stack.Navigator>
   </Provider>
 );

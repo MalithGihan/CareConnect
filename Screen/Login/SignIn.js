@@ -7,6 +7,7 @@ import { useNavigation } from "@react-navigation/native";
 import { reducer } from '../../utils/reducers/formReducers';
 import { validateInput } from '../../utils/actions/formActions';
 import { useDispatch } from 'react-redux';
+import { signIn } from '../../utils/actions/authActions';
 
 
 const initialState = {
@@ -35,7 +36,27 @@ export default SignIn = () => {
   }, [dispatchFormState]);
 
   const authHandler = async () => {
+    try {
+      setIsLoading(true);
+      const result = await dispatch(signIn(formState.inputValues.email, formState.inputValues.password));
+      const { userData } = result;
   
+      setError(null);
+      setIsLoading(false);
+  
+        if (userData.role === 'healthProvider') {
+          console.log("It's health provider") 
+        } else if (userData.role === 'doctor') {
+          navigation.navigate("Home Doctor");  
+        } else {
+          console.log("It's patient")
+        }
+      
+    } catch (error) {
+      console.log(error);
+      setIsLoading(false);
+      setError(error.message);
+    }
 };
 
 
@@ -77,7 +98,7 @@ export default SignIn = () => {
             <Text style={{ fontSize: 12, color: 'black' }}>
               Don't have an account?
             </Text>
-            <TouchableOpacity onPress={() => navigation.navigate("SignUp")}>
+            <TouchableOpacity onPress={() => navigation.navigate("Sign Up")}>
               <Text style={{ fontSize: 14, fontWeight: '800', color: 'black' }}>
                 {" "}Sign Up
               </Text>

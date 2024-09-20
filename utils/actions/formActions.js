@@ -7,5 +7,7 @@ export const validateInput = (inputId, inputValue) => {
         return validateEmail(inputId,inputValue)
     }else if (inputId === "password" || inputId === "passwordConfirm"){
         return validatePassword(inputId,inputValue)
+    }else if (inputId === "role" || inputId === "fullName" || inputId === "phoneNumber" || inputId === "address" ||inputId === "nic" ||inputId === "dateOfBrirth" ||inputId === "education" ||inputId === "hospital" || inputId === "jobStart"){
+        return validateString(inputId,inputValue)
     }
 }
