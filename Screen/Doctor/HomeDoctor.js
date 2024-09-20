@@ -4,12 +4,14 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { Ionicons } from '@expo/vector-icons';
 import DashboardDoctor from './DashboardDoctor';
-
+import DProfile from './DProfile';
+import QRscanner from '../Common/QRscanner';
+import SearchPatient from './SearchPatient';
 
 const DashboardScreen = 'DashboardDoctor'
-const AddReportScreen = ''
-const ProfileScreen = ''
-const PateintReportScannerScreen = ''
+const SearchPatientScreen = 'SearchPatient'
+const ProfileScreen = 'DProfile'
+const PateintReportScannerScreen = 'QRscanner'
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -18,6 +20,22 @@ function DashboardStack() {
   return (
     <Stack.Navigator>
         <Stack.Screen name='Dashbord' component={DashboardDoctor} options={{headerShown:false}} />
+    </Stack.Navigator>
+  )
+}
+
+function QRScanStack() {
+  return (
+    <Stack.Navigator>
+        <Stack.Screen name='QR Scanner' component={QRscanner} options={{headerShown:false}} />
+    </Stack.Navigator>
+  )
+}
+
+function AddReportStack() {
+  return (
+    <Stack.Navigator>
+        <Stack.Screen name='Search Patient' component={SearchPatient} options={{headerShown:false}} />
     </Stack.Navigator>
   )
 }
@@ -34,7 +52,7 @@ export default function HomeDoctor() {
             iconName = focused ? 'language' : 'language-outline';
           } else if (route.name === ProfileScreen) {
             iconName = focused ? 'person' : 'person-outline';
-          } else if (route.name === AddReportScreen) {
+          } else if (route.name === SearchPatientScreen) {
             iconName = focused ? 'globe' : 'globe-outline';
           } else if (route.name === PateintReportScannerScreen) {
             iconName = focused ? 'globe' : 'globe-outline';
@@ -49,6 +67,9 @@ export default function HomeDoctor() {
       })}
     >
       <Tab.Screen name={DashboardScreen} component={DashboardStack} />
+      <Tab.Screen name={PateintReportScannerScreen} component={QRScanStack} />
+      <Tab.Screen name={SearchPatientScreen} component={AddReportStack} />
+      <Tab.Screen name={ProfileScreen} component={DProfile} />
       
     </Tab.Navigator>
   );

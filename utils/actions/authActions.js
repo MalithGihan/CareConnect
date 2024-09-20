@@ -136,7 +136,7 @@ export const logout = async (dispatch, navigation) => {
 
     dispatch(clearAuth());
 
-    navigation.navigate("SignIn");
+    navigation.navigate("Default Home");
   } catch (error) {
     console.error("Logout error:", error);
   }

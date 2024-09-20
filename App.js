@@ -10,7 +10,8 @@ import { Provider } from "react-redux";
 import { SignIn } from "./Screen/Login";
 import {SignUp} from "./Screen/Login";
 import HomeDoctor from "./Screen/Doctor/HomeDoctor";
-
+import HomeHP from "./Screen/HP/HomeHP";
+import HomePatient from "./Screen/Patient/HomePatient";
 
 import { store } from "./store/store";
 
@@ -36,6 +37,8 @@ const MainStack = () => (
     <Stack.Screen name="Sign In" component={SignIn} />
     <Stack.Screen name="Sign Up" component={SignUp} />
     <Stack.Screen name="Home Doctor" component={HomeDoctor} />
+    <Stack.Screen name="Home Healthcare Provider" component={HomeHP} />
+    <Stack.Screen name="Home Patient" component={HomePatient} />
   </Stack.Navigator>
   </Provider>
 );

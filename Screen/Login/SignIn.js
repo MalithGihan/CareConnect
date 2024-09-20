@@ -45,11 +45,11 @@ export default SignIn = () => {
       setIsLoading(false);
   
         if (userData.role === 'healthProvider') {
-          console.log("It's health provider") 
+          navigation.navigate("Home Healthcare Provider");  
         } else if (userData.role === 'doctor') {
           navigation.navigate("Home Doctor");  
         } else {
-          console.log("It's patient")
+          navigation.navigate("Home Patient");
         }
       
     } catch (error) {
