@@ -135,7 +135,9 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   tabButton: {
+    marginHorizontal:15,
     padding: 10,
+    borderRadius: 10,
     flex: 1,
     alignItems: 'center',
   },

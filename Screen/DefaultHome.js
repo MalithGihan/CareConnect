@@ -48,7 +48,7 @@ export default function DefaultHome() {
         <CommonNavBtn 
           title='Clear Onboarding'
           onPress={clearOnboarding}
-          style={{ marginVertical: 8 }}
+          style={{ marginVertical: 8 ,backgroundColor:'white'}}
         />
       </View>
     </View>
