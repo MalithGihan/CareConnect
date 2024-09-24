@@ -1,12 +1,15 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, View, Button, TextInput } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, Text, View, Button, TextInput } from 'react-native'; 
 import { Calendar } from 'react-native-calendars';
-import { updateClinicDate } from '../../utils/actions/userActions';
+import { updateClinicDate, fetchDoctors } from '../../utils/actions/userActions'; 
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { Picker } from '@react-native-picker/picker'; 
+
 
 export default function ClinicDateSelection() {
     const [selectedDate, setSelectedDate] = useState('');
     const [doctor, setDoctor] = useState('');
+    const [doctors, setDoctors] = useState([]); 
     const [venue, setVenue] = useState('');
     const [time, setTime] = useState('');
     const [showCalendar, setShowCalendar] = useState(false);
@@ -14,6 +17,16 @@ export default function ClinicDateSelection() {
     const navigation = useNavigation();
     const route = useRoute();
     const { selectedPatientIds } = route.params;
+
+    
+    useEffect(() => {
+        const loadDoctors = async () => {
+            const doctorsList = await fetchDoctors(); 
+            setDoctors(doctorsList);
+        };
+
+        loadDoctors();
+    }, []);
 
     const handleUpdateClinicDate = async () => {
         if (selectedDate && doctor && venue && time) {
@@ -47,12 +60,18 @@ export default function ClinicDateSelection() {
             )}
             <Text>Selected Date: {selectedDate}</Text>
 
-            <TextInput
+            <Text>Select Doctor:</Text>
+            <Picker
+                selectedValue={doctor}
+                onValueChange={(itemValue) => setDoctor(itemValue)}
                 style={styles.input}
-                placeholder="Doctor"
-                value={doctor}
-                onChangeText={setDoctor}
-            />
+            >
+                <Picker.Item label="Select a doctor" value="" />
+                {doctors.map((doc) => (
+                    <Picker.Item key={doc.id} label={doc.name} value={doc.name} />
+                ))}
+            </Picker>
+
             <TextInput
                 style={styles.input}
                 placeholder="Venue"

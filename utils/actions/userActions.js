@@ -192,3 +192,32 @@ export const getUserNotes = async (userId) => {
     throw err;
   }
 };
+
+export const fetchDoctors = async () => {
+  try {
+      const app = getFirebaseApp();
+      const dbRef = ref(getDatabase(app));
+      const usersRef = child(dbRef, 'user');
+
+      const snapshot = await get(usersRef);
+
+      if (snapshot.exists()) {
+          const usersData = snapshot.val();
+      
+          const doctors = Object.keys(usersData)
+              .filter(userId => usersData[userId].role === 'doctor')
+              .map(userId => ({
+                  id: userId,
+                  name: usersData[userId].userName,
+                  specialty: usersData[userId].specialty 
+              }));
+          
+          return doctors;
+      } else {
+          return [];
+      }
+  } catch (err) {
+      console.error("Error fetching doctors:", err);
+      return [];
+  }
+};
