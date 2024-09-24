@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, FlatList, TouchableOpacity, ToastAndroid } from 'react-native';
+import { StyleSheet, View, Text, FlatList, TouchableOpacity, ToastAndroid, Alert } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import { useSelector } from 'react-redux';
-import { getUserClinicDates, getUserNotes } from '../../utils/actions/userActions';
+import { getUserClinicAppointments, getUserNotes } from '../../utils/actions/userActions';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 
 export default function ScheduleView() {
   const [markedDates, setMarkedDates] = useState({});
+  const [appointments, setAppointments] = useState([]);
   const [notes, setNotes] = useState({});
   const [selectedDate, setSelectedDate] = useState(null);
   const userData = useSelector((state) => state.auth.userData);
@@ -15,7 +16,7 @@ export default function ScheduleView() {
 
   useEffect(() => {
     if (userData && userData.userId) {
-      fetchAndDisplayClinicDates(userData.userId);
+      fetchAndDisplayClinicAppointments(userData.userId);
       fetchUserNotes(userData.userId);
     }
   }, [userData]);
@@ -23,40 +24,44 @@ export default function ScheduleView() {
   useFocusEffect(
     React.useCallback(() => {
       if (userData && userData.userId) {
-        fetchUserNotes(userData.userId); 
+        fetchUserNotes(userData.userId);
       }
     }, [userData])
   );
 
   useEffect(() => {
     if (selectedDate && userData) {
-      fetchUserNotes(userData.userId); 
+      fetchUserNotes(userData.userId);
     }
   }, [selectedDate]);
 
-  const fetchAndDisplayClinicDates = async (userId) => {
+  const fetchAndDisplayClinicAppointments = async (userId) => {
     try {
-      const clinicDates = await getUserClinicDates(userId);
-      const markedDatesObj = clinicDates.reduce((acc, date) => {
-        acc[date] = {
+      const clinicAppointments = await getUserClinicAppointments(userId);
+      setAppointments(clinicAppointments);
+      const markedDatesObj = clinicAppointments.reduce((acc, appointment) => {
+        acc[appointment.date] = {
           selected: true,
           selectedColor: 'blue',
+          marked: true,
+          dotColor: 'red',
         };
         return acc;
       }, {});
       setMarkedDates(markedDatesObj);
     } catch (error) {
-      console.error("Error fetching and displaying clinic dates:", error);
+      console.error("Error fetching and displaying clinic appointments:", error);
+      Alert.alert("Error", "Failed to fetch clinic appointments. Please try again.");
     }
   };
 
   const fetchUserNotes = async (userId) => {
     try {
       const userNotes = await getUserNotes(userId);
-      console.log(userNotes); 
       setNotes(userNotes);
     } catch (error) {
       console.error("Error fetching user notes:", error);
+      Alert.alert("Error", "Failed to fetch notes. Please try again.");
     }
   };
 
@@ -68,6 +73,14 @@ export default function ScheduleView() {
     }
   };
 
+  const renderAppointment = ({ item }) => (
+    <View style={styles.appointmentItem}>
+      <Text style={styles.appointmentText}>Dr. {item.doctor}</Text>
+      <Text style={styles.appointmentText}>Venue: {item.venue}</Text>
+      <Text style={styles.appointmentText}>Time: {item.time}</Text>
+    </View>
+  );
+
   const renderNote = ({ item }) => (
     <View style={styles.noteItem}>
       <Text>{item.text}</Text>
@@ -76,7 +89,12 @@ export default function ScheduleView() {
   );
 
   const handleAddNotePress = () => {
-    navigation.navigate('AddNote', { userId: userData.userId, selectedDate });
+    const selectedAppointment = appointments.find(apt => apt.date === selectedDate);
+    if (selectedAppointment) {
+      navigation.navigate('AddNote', { userId: userData.userId, appointmentId: selectedAppointment.id });
+    } else {
+      ToastAndroid.show('No appointment found for this date.', ToastAndroid.SHORT);
+    }
   };
 
   const isClinicDate = selectedDate && markedDates[selectedDate];
@@ -92,21 +110,27 @@ export default function ScheduleView() {
         onDayPress={handleDayPress}
       />
       {selectedDate && (
-        <View style={styles.notesSection}>
+        <View style={styles.detailsSection}>
+          <Text style={styles.sectionTitle}>Appointments for {selectedDate}</Text>
+          <FlatList
+            data={appointments.filter(apt => apt.date === selectedDate)}
+            renderItem={renderAppointment}
+            keyExtractor={(item) => item.id}
+            ListEmptyComponent={<Text>No appointments for this date.</Text>}
+          />
+          <Text style={styles.sectionTitle}>Notes</Text>
           <FlatList
             data={notes[selectedDate] ? Object.values(notes[selectedDate]) : []}
             renderItem={renderNote}
             keyExtractor={(item) => item.timestamp.toString()}
-            ListHeaderComponent={<Text style={styles.sectionTitle}>Notes for {selectedDate}</Text>}
-            ListFooterComponent={notes[selectedDate]?.length === 0 ? <Text>No notes for this date.</Text> : <View style={{ height: 200 }} />}
+            ListEmptyComponent={<Text>No notes for this date.</Text>}
           />
         </View>
       )}
       {isClinicDate && (
         <TouchableOpacity 
-          style={[styles.floatingButton, isClinicDate ? {} : styles.disabledButton]} 
+          style={styles.floatingButton} 
           onPress={handleAddNotePress}
-          disabled={!isClinicDate}
         >
           <Ionicons name="add" size={30} color="white" />
         </TouchableOpacity>
@@ -120,17 +144,25 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
-  notesSection: {
+  detailsSection: {
     padding: 20,
     flex: 1,
-  },
-  scrollView: {
-    maxHeight: 200,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
+    marginTop: 10,
     marginBottom: 10,
+  },
+  appointmentItem: {
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+    width: '100%',
+  },
+  appointmentText: {
+    fontSize: 16,
+    marginBottom: 5,
   },
   noteItem: {
     padding: 10,
@@ -157,8 +189,5 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
-  },
-  disabledButton: {
-    backgroundColor: '#A9A9A9',
   },
 });

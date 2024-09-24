@@ -37,7 +37,7 @@ export default function Addnote({ route }) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create ({
   container: {
     flex: 1,
     padding: 20,

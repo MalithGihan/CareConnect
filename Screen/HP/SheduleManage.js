@@ -1,67 +1,73 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, FlatList, Button } from 'react-native';
-import { Calendar } from 'react-native-calendars';
-import { getAllPatients, updateClinicDate } from '../../utils/actions/userActions';
+import { StyleSheet, Text, View, FlatList, Button, Alert } from 'react-native';
+import { getAllPatients, getUserClinicAppointments } from '../../utils/actions/userActions';
+import { CheckBox } from 'react-native-elements';
+import { useNavigation } from '@react-navigation/native';
 
 export default function ScheduleManage() {
     const [patients, setPatients] = useState([]);
-    const [selectedDate, setSelectedDate] = useState('');
-    const [showCalendar, setShowCalendar] = useState(false);
-    const [selectedPatientId, setSelectedPatientId] = useState(null);
+    const [selectedPatients, setSelectedPatients] = useState({});
+    const navigation = useNavigation();
 
     useEffect(() => {
         const fetchPatients = async () => {
-            const patientList = await getAllPatients();
-            setPatients(patientList);
+            try {
+                const patientList = await getAllPatients();
+                const patientsWithAppointments = await Promise.all(patientList.map(async (patient) => {
+                    const appointments = await getUserClinicAppointments(patient.id);
+                    return { ...patient, clinicAppointments: appointments };
+                }));
+                setPatients(patientsWithAppointments);
+            } catch (error) {
+                console.error("Error fetching patients:", error);
+                Alert.alert("Error", "Failed to fetch patients. Please try again.");
+            }
         };
-
         fetchPatients();
     }, []);
 
-    const handleUpdateClinicDate = async () => {
-        if (selectedPatientId) {
-            await updateClinicDate(selectedPatientId, selectedDate);
-            setSelectedDate(''); // Clear selected date after update
-            setShowCalendar(false); // Close calendar
-            // Optionally refetch patients or update state here
-        }
+    const togglePatientSelection = (id) => {
+        setSelectedPatients(prev => ({
+            ...prev,
+            [id]: !prev[id]
+        }));
+    };
+
+    const handleSelectClinicDate = () => {
+        const selectedPatientIds = Object.keys(selectedPatients).filter(id => selectedPatients[id]);
+        navigation.navigate('ClinicDateSelection', { selectedPatientIds });
     };
 
     const renderPatient = ({ item }) => (
         <View style={styles.patientItem}>
-            <Text style={styles.patientName}>{item.name}</Text>
-            <Text>{item.email}</Text>
-            <Text>Clinic Dates: {item.clinicDates ? item.clinicDates.join(', ') : "No clinic dates set"}</Text>
-            <Button
-                title="Select Clinic Date"
-                onPress={() => {
-                    setShowCalendar(true);
-                    setSelectedPatientId(item.id); // Set selected patient ID
-                }}
+            <CheckBox
+                checked={selectedPatients[item.id] || false}
+                onPress={() => togglePatientSelection(item.id)}
             />
-            <Button
-                title="Update Clinic Date"
-                onPress={handleUpdateClinicDate}
-                disabled={!selectedDate} // Disable if no date is selected
-            />
+            <View style={styles.patientInfo}>
+                <Text style={styles.patientEmail}>{item.email}</Text>
+                <Text>Clinic Appointments:</Text>
+                {item.clinicAppointments && item.clinicAppointments.length > 0 ? (
+                    item.clinicAppointments.map((appointment, index) => (
+                        <Text key={index}>
+                            {`${appointment.date} - Dr. ${appointment.doctor} at ${appointment.venue}, ${appointment.time}`}
+                        </Text>
+                    ))
+                ) : (
+                    <Text>No clinic appointments set</Text>
+                )}
+            </View>
         </View>
     );
 
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Schedule Management</Text>
-            {showCalendar && (
-                <Calendar
-                    onDayPress={(day) => {
-                        setSelectedDate(day.dateString);
-                        setShowCalendar(false); // Close calendar on date select
-                    }}
-                    markingType={'simple'}
-                    markedDates={{
-                        [selectedDate]: { selected: true, marked: true },
-                    }}
-                />
-            )}
+            <Button
+                title="Select Clinic Date"
+                onPress={handleSelectClinicDate}
+                disabled={Object.values(selectedPatients).every(v => !v)}
+            />
             <FlatList
                 data={patients}
                 renderItem={renderPatient}
@@ -71,7 +77,7 @@ export default function ScheduleManage() {
     );
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create ({
     container: {
         flex: 1,
         padding: 16,
@@ -82,13 +88,19 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     patientItem: {
+        flexDirection: 'row',
+        alignItems: 'flex-start',
         padding: 10,
         backgroundColor: '#f9f9f9',
         borderRadius: 8,
         marginBottom: 10,
     },
-    patientName: {
+    patientInfo: {
+        flex: 1,
+    },
+    patientEmail: {
         fontSize: 18,
         fontWeight: '600',
+        marginBottom: 5,
     },
-});
+})

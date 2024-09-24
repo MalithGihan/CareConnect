@@ -8,6 +8,7 @@ import QRscanner from '../Common/QRscanner';
 import HPProfile from './HPProfile';
 import SheduleManage from './SheduleManage';
 import ReportManage from '../Common/ReportManage';
+import ClinicDateSelection from '../HP/ClinicDateSelection'
 
 const DashboardScreen = 'DashboardHP'
 const SheduleManageScreen = 'SearchPatient'
@@ -38,6 +39,7 @@ function ReportManageStack() {
   return (
     <Stack.Navigator>
         <Stack.Screen name='Clinic Shedule' component={SheduleManage} options={{headerShown:false}} />
+        <Stack.Screen name="ClinicDateSelection" component={ClinicDateSelection} />
     </Stack.Navigator>
   )
 }

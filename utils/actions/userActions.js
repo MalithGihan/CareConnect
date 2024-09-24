@@ -48,96 +48,122 @@ export const getAllPatients = async () => {
     }
 };
 
-export const updateClinicDate = async (userId, newClinicDate) => {
-    try {
-        const app = getFirebaseApp();
-        const dbRef = ref(getDatabase(app));
-        const userRef = child(dbRef, `user/${userId}`);
-        
-        const snapshot = await get(userRef);
-        const userData = snapshot.val();
+export const updateClinicDate = async (userId, newClinicDate, doctor, venue, time) => {
+  try {
+      const app = getFirebaseApp();
+      const dbRef = ref(getDatabase(app));
+      const userRef = child(dbRef, `user/${userId}`);
+      
+      const snapshot = await get(userRef);
+      const userData = snapshot.val();
 
-        const updatedDates = userData.clinicDates ? [...userData.clinicDates, newClinicDate] : [newClinicDate];
+      const newClinicAppointment = {
+          date: newClinicDate,
+          doctor: doctor,
+          venue: venue,
+          time: time
+      };
 
-        await update(userRef, { clinicDates: updatedDates });
-        console.log(`Clinic date updated for user ${userId}`);
-    } catch (err) {
-        console.error("Error updating clinic date:", err);
-    }
+      const updatedAppointments = userData.clinicAppointments 
+          ? [...userData.clinicAppointments, newClinicAppointment] 
+          : [newClinicAppointment];
+
+      await update(userRef, { clinicAppointments: updatedAppointments });
+      console.log(`Clinic appointment updated for user ${userId}`);
+  } catch (err) {
+      console.error("Error updating clinic appointment:", err);
+      throw err; 
+  }
 };
 
-export const getUserClinicDates = async (userId) => {
-    try {
-      const app = getFirebaseApp();
-      const dbRef = ref(getDatabase(app));
-      const userRef = child(dbRef, `user/${userId}`);
-      const snapshot = await get(userRef);
-      const userData = snapshot.val();
-      return userData.clinicDates || [];
-    } catch (err) {
-      console.error("Error fetching user clinic dates:", err);
-      return [];
-    }
-  };
-  
-  export const updateClinicDateNotes = async (userId, clinicDate, note) => {
-    try {
-      const app = getFirebaseApp();
-      const dbRef = ref(getDatabase(app));
-      const userRef = child(dbRef, `user/${userId}`);
-      const snapshot = await get(userRef);
-      const userData = snapshot.val();
-  
-      const updatedDates = userData.clinicDates
-        ? userData.clinicDates.map((dateObj) =>
-            dateObj.date === clinicDate ? { ...dateObj, note } : dateObj
-          )
-        : [{ date: clinicDate, note }];
-  
-      await update(userRef, { clinicDates: updatedDates });
-      console.log(`Clinic date and note updated for user ${userId}`);
-    } catch (err) {
-      console.error("Error updating clinic date and note:", err);
-    }
-  };
-
-  export const updateAndFetchClinicDates = async (userId, newClinicDate) => {
-    try {
-      await updateClinicDate(userId, newClinicDate);
-      return await getUserClinicDates(userId);
-    } catch (error) {
-      console.error("Error updating and fetching clinic dates:", error);
-      throw error;
-    }
-  };
-
-  export const saveUserNote = async (userId, date, note) => {
-    try {
-      const app = getFirebaseApp();
-      const dbRef = ref(getDatabase(app));
-      const userRef = child(dbRef, `user/${userId}/notes/${date}`);
-      
-      await update(userRef, { note });
-      console.log(`Note saved for user ${userId} on date ${date}`);
-    } catch (err) {
-      console.error("Error saving note:", err);
-    }
-  };
-  
-
-  export const addUserNote = async (userId, date, note) => {
+export const getUserClinicAppointments = async (userId) => {
   try {
     const app = getFirebaseApp();
     const dbRef = ref(getDatabase(app));
-    const userNotesRef = child(dbRef, `user/${userId}/notes/${date}`);
-    
-    // Push the new note to create a unique key
-    const newNoteRef = push(userNotesRef);
-    await update(newNoteRef, { text: note, timestamp: Date.now() });
-    
-    console.log(`Note added for user ${userId} on date ${date}`);
+    const userRef = child(dbRef, `user/${userId}`);
+    const snapshot = await get(userRef);
+    const userData = snapshot.val();
+    return userData.clinicAppointments || [];
+  } catch (err) {
+    console.error("Error fetching user clinic appointments:", err);
+    throw err;
+  }
+};
+
+export const updateClinicAppointmentNotes = async (userId, appointmentId, note) => {
+  try {
+    const app = getFirebaseApp();
+    const dbRef = ref(getDatabase(app));
+    const userRef = child(dbRef, `user/${userId}`);
+    const snapshot = await get(userRef);
+    const userData = snapshot.val();
+
+    const updatedAppointments = userData.clinicAppointments
+      ? userData.clinicAppointments.map((appointment) =>
+          appointment.id === appointmentId ? { ...appointment, note } : appointment
+        )
+      : [];
+
+    await update(userRef, { clinicAppointments: updatedAppointments });
+    console.log(`Clinic appointment note updated for user ${userId}`);
+  } catch (err) {
+    console.error("Error updating clinic appointment note:", err);
+    throw err;
+  }
+};
+
+export const updateAndFetchClinicAppointments = async (userId, newAppointment) => {
+  try {
+    await updateClinicDate(userId, newAppointment.date, newAppointment.doctor, newAppointment.venue, newAppointment.time);
+    return await getUserClinicAppointments(userId);
+  } catch (error) {
+    console.error("Error updating and fetching clinic appointments:", error);
+    throw error;
+  }
+};
+
+export const saveUserNote = async (userId, appointmentId, note) => {
+  try {
+    const app = getFirebaseApp();
+    const dbRef = ref(getDatabase(app));
+    const userRef = child(dbRef, `user/${userId}`);
+    const snapshot = await get(userRef);
+    const userData = snapshot.val();
+
+    const updatedAppointments = userData.clinicAppointments.map(appointment => 
+      appointment.id === appointmentId ? { ...appointment, note } : appointment
+    );
+
+    await update(userRef, { clinicAppointments: updatedAppointments });
+    console.log(`Note saved for user ${userId} for appointment ${appointmentId}`);
+  } catch (err) {
+    console.error("Error saving note:", err);
+    throw err;
+  }
+};
+
+export const addUserNote = async (userId, appointmentId, noteText) => {
+  try {
+    const app = getFirebaseApp();
+    const dbRef = ref(getDatabase(app));
+    const userRef = child(dbRef, `user/${userId}`);
+    const snapshot = await get(userRef);
+    const userData = snapshot.val();
+
+    const updatedAppointments = userData.clinicAppointments.map(appointment => {
+      if (appointment.id === appointmentId) {
+        const newNote = { text: noteText, timestamp: Date.now() };
+        const notes = appointment.notes ? [...appointment.notes, newNote] : [newNote];
+        return { ...appointment, notes };
+      }
+      return appointment;
+    });
+
+    await update(userRef, { clinicAppointments: updatedAppointments });
+    console.log(`Note added for user ${userId} for appointment ${appointmentId}`);
   } catch (err) {
     console.error("Error adding note:", err);
+    throw err;
   }
 };
 
@@ -145,12 +171,24 @@ export const getUserNotes = async (userId) => {
   try {
     const app = getFirebaseApp();
     const dbRef = ref(getDatabase(app));
-    const userNotesRef = child(dbRef, `user/${userId}/notes`);
-    const snapshot = await get(userNotesRef);
-    const notesData = snapshot.val();
-    return notesData || {};
+    const userRef = child(dbRef, `user/${userId}`);
+    const snapshot = await get(userRef);
+    const userData = snapshot.val();
+
+    if (!userData.clinicAppointments) {
+      return {};
+    }
+
+    const notes = {};
+    userData.clinicAppointments.forEach((appointment, index) => {
+      if (appointment.notes) {
+        notes[appointment.date] = appointment.notes;
+      }
+    });
+
+    return notes;
   } catch (err) {
     console.error("Error fetching user notes:", err);
-    return {};
+    throw err;
   }
 };
