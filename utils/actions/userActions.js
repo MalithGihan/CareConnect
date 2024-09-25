@@ -1,4 +1,4 @@
-import { child,get,getDatabase,ref , update ,push} from "firebase/database";
+import { child,get,getDatabase,ref , update ,push , set} from "firebase/database";
 import { getFirebaseApp } from "../firebaseHelper";
 
 export const getUserData = async (userId) => {
@@ -219,5 +219,113 @@ export const fetchDoctors = async () => {
   } catch (err) {
       console.error("Error fetching doctors:", err);
       return [];
+  }
+};
+
+//
+export const addDateSlot = async (date, timeSlots) => {
+  try {
+    const app = getFirebaseApp();
+    const dbRef = ref(getDatabase(app));
+    
+    const dateSlotRef = child(dbRef, `dateSlots/${date}`);
+
+    const snapshot = await get(dateSlotRef);
+    const existingSlotData = snapshot.val();
+
+    if (existingSlotData && existingSlotData.timeslots) {
+      const updatedTimeSlots = [...new Set([...existingSlotData.timeslots, ...timeSlots])]; 
+      await update(dateSlotRef, { timeslots: updatedTimeSlots }); 
+      console.log(`Time slots for ${date} updated successfully`);
+    } else {
+   
+      await set(dateSlotRef, { timeslots: timeSlots }); 
+      console.log(`Date slot added on ${date}`);
+    }
+    return date;
+  } catch (err) {
+    console.error("Error adding date slot:", err);
+    throw err;
+  }
+};
+
+
+export const getDateSlots = async () => {
+  try {
+    const app = getFirebaseApp();
+    const dbRef = ref(getDatabase(app));
+    const dateSlotsRef = child(dbRef, 'dateSlots');
+    
+    const snapshot = await get(dateSlotsRef);
+    const dateSlotsData = snapshot.val();
+
+    if (!dateSlotsData) {
+      throw new Error(`No date slots found`);
+    }
+
+    return dateSlotsData;
+  } catch (err) {
+    console.error("Error getting date slots:", err);
+    throw err;
+  }
+};
+
+
+export const updateDateSlot = async (dateSlotId, updatedTimeSlots) => {
+  try {
+    const app = getFirebaseApp();
+    const dbRef = ref(getDatabase(app));
+    const dateSlotRef = child(dbRef, `dateSlots/${dateSlotId}`);
+    
+    await update(dateSlotRef, { timeSlots: updatedTimeSlots });
+    console.log(`Date slot ${dateSlotId} updated`);
+  } catch (err) {
+    console.error("Error updating date slot:", err);
+    throw err;
+  }
+};
+
+
+export const deleteDateSlot = async (dateSlotId) => {
+  try {
+    const app = getFirebaseApp();
+    const dbRef = ref(getDatabase(app));
+    const dateSlotRef = child(dbRef, `dateSlots/${dateSlotId}`);
+    
+    await update(dateSlotRef, null);
+    console.log(`Date slot ${dateSlotId} deleted`);
+  } catch (err) {
+    console.error("Error deleting date slot:", err);
+    throw err;
+  }
+};
+
+
+
+export const blockTimeSlot = async (date, time) => {
+  try {
+    const app = getFirebaseApp();
+    const dbRef = ref(getDatabase(app));
+    const dateSlotRef = child(dbRef, `dateSlots/${date}`);
+
+    const snapshot = await get(dateSlotRef);
+    const existingSlotData = snapshot.val();
+    console.log("Existing Slot Data:", existingSlotData); 
+
+    if (existingSlotData && existingSlotData.timeslots && existingSlotData.timeslots.timeslots) {
+      const updatedTimeSlots = existingSlotData.timeslots.timeslots.map(slot => {
+        if (slot.time === time) {
+          return { ...slot, booked: true }; 
+        }
+        return slot;
+      });
+      await update(dateSlotRef, { timeslots: { timeslots: updatedTimeSlots } });
+      console.log(`Time slot ${time} has been booked for date ${date}.`);
+    } else {
+      console.log(`No existing time slots found for date ${date}.`);
+    }
+  } catch (error) {
+    console.error('Error blocking time slot:', error);
+    throw new Error('Failed to block time slot');
   }
 };

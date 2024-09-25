@@ -33,6 +33,15 @@ export default function ScheduleManage() {
         }));
     };
 
+    const toggleSelectAll = () => {
+        const allSelected = Object.keys(selectedPatients).length === patients.length && Object.values(selectedPatients).every(v => v);
+        const newSelection = patients.reduce((acc, patient) => {
+            acc[patient.id] = !allSelected;
+            return acc;
+        }, {});
+        setSelectedPatients(newSelection);
+    };
+
     const handleSelectClinicDate = () => {
         const selectedPatientIds = Object.keys(selectedPatients).filter(id => selectedPatients[id]);
         navigation.navigate('ClinicDateSelection', { selectedPatientIds });
@@ -63,6 +72,11 @@ export default function ScheduleManage() {
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Schedule Management</Text>
+            <CheckBox
+                title="Select All"
+                checked={Object.keys(selectedPatients).length === patients.length && Object.values(selectedPatients).every(v => v)}
+                onPress={toggleSelectAll}
+            />
             <Button
                 title="Select Clinic Date"
                 onPress={handleSelectClinicDate}
@@ -71,13 +85,13 @@ export default function ScheduleManage() {
             <FlatList
                 data={patients}
                 renderItem={renderPatient}
-                keyExtractor={item => item.id}
+                keyExtractor={item => item.id.toString()}
             />
         </View>
     );
 }
 
-const styles = StyleSheet.create ({
+const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 16,
@@ -103,4 +117,4 @@ const styles = StyleSheet.create ({
         fontWeight: '600',
         marginBottom: 5,
     },
-})
+});
