@@ -8,12 +8,14 @@ import Patient_Profile from './PatientProfile';
 import Report from './ReportView';
 import Shedules from './SheduleView';
 import Medical_History from './MedicalHistoryView';
+import AddNotePage from './Addnote'; 
 
 const DashboardScreen = 'Dashboard'
 const SheduleViewScreen = 'Shedules'
 const ProfileScreen = 'Patient_Profile'
 const ReportViewScreen = 'Report'
 const MedicalHistoryScreen = 'Medical_History'
+const AddNoteScreen = 'AddNote' 
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -21,7 +23,7 @@ const Stack = createStackNavigator();
 function DashboardStack() {
   return (
     <Stack.Navigator>
-        <Stack.Screen name='Dashbord' component={Dashboard} options={{headerShown:false}} />
+      <Stack.Screen name='Dashbord' component={Dashboard} options={{headerShown:false}} />
     </Stack.Navigator>
   )
 }
@@ -29,7 +31,7 @@ function DashboardStack() {
 function MedicalHistoryStack() {
   return (
     <Stack.Navigator>
-        <Stack.Screen name='Medical History' component={Medical_History} options={{headerShown:false}} />
+      <Stack.Screen name='Medical History' component={Medical_History} options={{headerShown:false}} />
     </Stack.Navigator>
   )
 }
@@ -37,7 +39,7 @@ function MedicalHistoryStack() {
 function ReportStack() {
   return (
     <Stack.Navigator>
-        <Stack.Screen name='Reports' component={Report} options={{headerShown:false}} />
+      <Stack.Screen name='Reports' component={Report} options={{headerShown:false}} />
     </Stack.Navigator>
   )
 }
@@ -45,7 +47,8 @@ function ReportStack() {
 function SheduleStack() {
   return (
     <Stack.Navigator>
-        <Stack.Screen name='Clinic Shedules' component={Shedules} options={{headerShown:false}} />
+      <Stack.Screen name='Clinic Shedules' component={Shedules} options={{headerShown:false}} />
+      <Stack.Screen name={AddNoteScreen} component={AddNotePage} options={{headerShown:true, title: 'Add Note'}} />
     </Stack.Navigator>
   )
 }
@@ -57,17 +60,16 @@ export default function HomePatient() {
       screenOptions={({ route }) => ({
         tabBarIcon: ({ focused, color, size }) => {
           let iconName;
-
           if (route.name === DashboardScreen) {
-            iconName = focused ? 'language' : 'language-outline';
+            iconName = focused ? 'home' : 'home-outline';
           } else if (route.name === SheduleViewScreen) {
-            iconName = focused ? 'globe' : 'person-outline';
+            iconName = focused ? 'calendar' : 'calendar-outline';
           } else if (route.name === ReportViewScreen) {
-            iconName = focused ? 'globe' : 'globe-outline';
+            iconName = focused ? 'document-text' : 'document-text-outline';
           } else if (route.name === MedicalHistoryScreen) {
-            iconName = focused ? 'globe' : 'globe-outline';
+            iconName = focused ? 'medical' : 'medical-outline';
           }  else if (route.name === ProfileScreen) {
-            iconName = focused ? 'person' : 'globe-outline';
+            iconName = focused ? 'person' : 'person-outline';
           } 
           return <Ionicons name={iconName} size={size} color={color} />;
         },
@@ -83,7 +85,6 @@ export default function HomePatient() {
       <Tab.Screen name={ReportViewScreen} component={ReportStack} />
       <Tab.Screen name={SheduleViewScreen} component={SheduleStack} />
       <Tab.Screen name={ProfileScreen} component={Patient_Profile} />
-      
     </Tab.Navigator>
   );
 }
