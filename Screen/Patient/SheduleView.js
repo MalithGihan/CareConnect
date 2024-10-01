@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, FlatList, TouchableOpacity, ToastAndroid, Alert } from 'react-native';
+import { StyleSheet, View, Text, FlatList, TouchableOpacity, ToastAndroid, Alert, Pressable } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import { useSelector } from 'react-redux';
-import { getUserClinicAppointments, getUserNotes } from '../../utils/actions/userActions';
+import { getUserClinicAppointments, getUserNotes, getUserNotifications } from '../../utils/actions/userActions';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -11,6 +11,7 @@ export default function ScheduleView() {
   const [appointments, setAppointments] = useState([]);
   const [notes, setNotes] = useState({});
   const [selectedDate, setSelectedDate] = useState(null);
+  const [unreadCount, setUnreadCount] = useState(0);
   const userData = useSelector((state) => state.auth.userData);
   const navigation = useNavigation();
 
@@ -18,6 +19,7 @@ export default function ScheduleView() {
     if (userData && userData.userId) {
       fetchAndDisplayClinicAppointments(userData.userId);
       fetchUserNotes(userData.userId);
+      fetchUserNotifications(userData.userId);
     }
   }, [userData]);
 
@@ -25,6 +27,7 @@ export default function ScheduleView() {
     React.useCallback(() => {
       if (userData && userData.userId) {
         fetchUserNotes(userData.userId);
+        fetchUserNotifications(userData.userId);
       }
     }, [userData])
   );
@@ -62,6 +65,17 @@ export default function ScheduleView() {
     } catch (error) {
       console.error("Error fetching user notes:", error);
       Alert.alert("Error", "Failed to fetch notes. Please try again.");
+    }
+  };
+
+  const fetchUserNotifications = async (userId) => {
+    try {
+      const notifications = await getUserNotifications(userId);
+      const unreadNotifications = notifications.filter(notification => !notification.read);
+      setUnreadCount(unreadNotifications.length);
+    } catch (error) {
+      console.error("Error fetching user notifications:", error);
+      Alert.alert("Error", "Failed to fetch notifications. Please try again.");
     }
   };
 
@@ -109,6 +123,16 @@ export default function ScheduleView() {
         markedDates={markedDates}
         onDayPress={handleDayPress}
       />
+      <Pressable onPress={() => navigation.navigate("notifications")}>
+        <View style={styles.notificationIcon}>
+          <Ionicons name="notifications-outline" size={24} color="black" />
+          {unreadCount > 0 && (
+            <View style={styles.badge}>
+              <Text style={styles.badgeText}>{unreadCount}</Text>
+            </View>
+          )}
+        </View>
+      </Pressable>
       {selectedDate && (
         <View style={styles.detailsSection}>
           <Text style={styles.sectionTitle}>Appointments for {selectedDate}</Text>
@@ -128,8 +152,8 @@ export default function ScheduleView() {
         </View>
       )}
       {isClinicDate && (
-        <TouchableOpacity 
-          style={styles.floatingButton} 
+        <TouchableOpacity
+          style={styles.floatingButton}
           onPress={handleAddNotePress}
         >
           <Ionicons name="add" size={30} color="white" />
@@ -189,5 +213,25 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
+  },
+  notificationIcon: {
+    position: 'relative',
+    marginRight: 20,
+  },
+  badge: {
+    position: 'absolute',
+    right: -10,
+    top: -5,
+    backgroundColor: 'red',
+    borderRadius: 10,
+    width: 20,
+    height: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  badgeText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 12,
   },
 });
