@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, FlatList } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import Toast from 'react-native-toast-message';
-import { addDateSlot, getDateSlots } from '../../utils/actions/userActions';
+import { CreateDateSlots, getDateSlots } from '../../utils/actions/userActions';
 
 const DashboardHP = () => {
   const [selectedDate, setSelectedDate] = useState('');
@@ -91,7 +91,7 @@ const DashboardHP = () => {
             text2: `Time slots for ${selectedDate} already exist.`
           });
         } else {
-          await addDateSlot(selectedDate, { timeslots: newSlots });
+          await CreateDateSlots(selectedDate, { timeslots: newSlots });
           setDateSlots((prevSlots) => ({
             ...prevSlots,
             [selectedDate]: { timeslots: newSlots },

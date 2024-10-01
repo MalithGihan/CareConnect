@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, Button, ScrollView, TextInput } from 'react-native';
 import { Calendar } from 'react-native-calendars';
-import { updateClinicDate, fetchDoctors, getDateSlots, blockTimeSlot, sendUserNotification } from '../../utils/actions/userActions';
+import { AddClinicDate, fetchDoctors, getDateSlots, blockTimeSlot, sendUserNotification } from '../../utils/actions/userActions';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Picker } from '@react-native-picker/picker';
 import Toast from 'react-native-toast-message';
@@ -104,13 +104,13 @@ export default function ClinicDateSelection() {
         }
     };
 
-    const handleUpdateClinicDate = async () => {
+    const handleAddClinicDate = async () => {
         if (selectedDate && doctor && venue && time) {
             try {
                 setLoading(true);
                 const promises = selectedPatientIds.map((id, index) => {
                     const appointmentTime = index === 0 ? time : patientTimes[index];
-                    return updateClinicDate(id, selectedDate, doctor, venue, appointmentTime);
+                    return AddClinicDate(id, selectedDate, doctor, venue, appointmentTime);
                 });
                 await Promise.all(promises);
                 await blockTimeSlot(selectedDate, time);
@@ -230,7 +230,7 @@ export default function ClinicDateSelection() {
 
                 <Button
                     title={loading ? "Updating..." : "Update Clinic Date for Selected Patients"}
-                    onPress={handleUpdateClinicDate}
+                    onPress={handleAddClinicDate}
                     disabled={!selectedDate || !doctor || !venue || !time || loading}
                 />
                 <Toast />

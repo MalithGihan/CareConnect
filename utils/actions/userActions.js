@@ -48,7 +48,7 @@ export const getAllPatients = async () => {
   }
 };
 
-export const updateClinicDate = async (userId, newClinicDate, doctor, venue, time) => {
+export const AddClinicDate = async (userId, newClinicDate, doctor, venue, time) => {
   try {
     const app = getFirebaseApp();
     const dbRef = ref(getDatabase(app));
@@ -172,7 +172,7 @@ export const fetchDoctors = async () => {
 };
 
 //
-export const addDateSlot = async (date, timeSlots) => {
+export const CreateDateSlots = async (date, timeSlots) => {
   try {
     const app = getFirebaseApp();
     const dbRef = ref(getDatabase(app));
