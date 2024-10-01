@@ -90,57 +90,6 @@ export const getUserClinicAppointments = async (userId) => {
   }
 };
 
-export const updateClinicAppointmentNotes = async (userId, appointmentId, note) => {
-  try {
-    const app = getFirebaseApp();
-    const dbRef = ref(getDatabase(app));
-    const userRef = child(dbRef, `user/${userId}`);
-    const snapshot = await get(userRef);
-    const userData = snapshot.val();
-
-    const updatedAppointments = userData.clinicAppointments
-      ? userData.clinicAppointments.map((appointment) =>
-        appointment.id === appointmentId ? { ...appointment, note } : appointment
-      )
-      : [];
-
-    await update(userRef, { clinicAppointments: updatedAppointments });
-    console.log(`Clinic appointment note updated for user ${userId}`);
-  } catch (err) {
-    console.error("Error updating clinic appointment note:", err);
-    throw err;
-  }
-};
-
-export const updateAndFetchClinicAppointments = async (userId, newAppointment) => {
-  try {
-    await updateClinicDate(userId, newAppointment.date, newAppointment.doctor, newAppointment.venue, newAppointment.time);
-    return await getUserClinicAppointments(userId);
-  } catch (error) {
-    console.error("Error updating and fetching clinic appointments:", error);
-    throw error;
-  }
-};
-
-export const saveUserNote = async (userId, appointmentId, note) => {
-  try {
-    const app = getFirebaseApp();
-    const dbRef = ref(getDatabase(app));
-    const userRef = child(dbRef, `user/${userId}`);
-    const snapshot = await get(userRef);
-    const userData = snapshot.val();
-
-    const updatedAppointments = userData.clinicAppointments.map(appointment =>
-      appointment.id === appointmentId ? { ...appointment, note } : appointment
-    );
-
-    await update(userRef, { clinicAppointments: updatedAppointments });
-    console.log(`Note saved for user ${userId} for appointment ${appointmentId}`);
-  } catch (err) {
-    console.error("Error saving note:", err);
-    throw err;
-  }
-};
 
 export const addUserNote = async (userId, appointmentId, noteText) => {
   try {
@@ -266,21 +215,6 @@ export const getDateSlots = async () => {
     return dateSlotsData;
   } catch (err) {
     console.error("Error getting date slots:", err);
-    throw err;
-  }
-};
-
-
-export const updateDateSlot = async (dateSlotId, updatedTimeSlots) => {
-  try {
-    const app = getFirebaseApp();
-    const dbRef = ref(getDatabase(app));
-    const dateSlotRef = child(dbRef, `dateSlots/${dateSlotId}`);
-
-    await update(dateSlotRef, { timeSlots: updatedTimeSlots });
-    console.log(`Date slot ${dateSlotId} updated`);
-  } catch (err) {
-    console.error("Error updating date slot:", err);
     throw err;
   }
 };
