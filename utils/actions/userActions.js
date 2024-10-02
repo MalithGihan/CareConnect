@@ -1,4 +1,4 @@
-import { child, get, getDatabase, ref, update, push, set } from "firebase/database";
+import { child, get, getDatabase, ref, update, push, set, remove, addDoc } from "firebase/database";
 import { getFirebaseApp } from "../firebaseHelper";
 
 export const getUserData = async (userId) => {
@@ -311,5 +311,109 @@ export const markNotificationAsRead = async (userId, notificationId) => {
     console.log(`Notification ${notificationId} marked as read for user ${userId}`);
   } catch (error) {
     console.error("Error marking notification as read:", error);
+  }
+};
+
+export const getPatientsByClinicDate = async (date) => {
+  try {
+    const app = getFirebaseApp();
+    const dbRef = ref(getDatabase(app));
+    const usersRef = child(dbRef, 'user');
+    const snapshot = await get(usersRef);
+
+    if (snapshot.exists()) {
+      const usersData = snapshot.val();
+      const patients = [];
+
+      Object.keys(usersData).forEach(userId => {
+        const user = usersData[userId];
+        if (user.role === 'patient') {
+          const clinicAppointments = user.clinicAppointments || [];
+          clinicAppointments.forEach(appointment => {
+            if (appointment.date === date) {
+              patients.push({
+                id: userId,
+                name: user.name,
+                email: user.email,
+                clinicDate: appointment.date,
+              });
+            }
+          });
+        }
+      });
+      return patients;
+    } else {
+      return [];
+    }
+  } catch (err) {
+    console.error("Error fetching patients for date:", err);
+    return [];
+  }
+};
+
+export const deleteClinicDateAndAppointments = async (selectedDate) => {
+  try {
+    const app = getFirebaseApp();
+    const db = getDatabase(app);
+    const dateSlotRef = ref(db, `dateSlots/${selectedDate}`);
+    await remove(dateSlotRef);
+    console.log(`Deleted dateSlot for ${selectedDate}`);
+
+    const usersRef = ref(db, 'user');
+    const snapshot = await get(usersRef);
+
+    if (snapshot.exists()) {
+      const usersData = snapshot.val();
+
+      for (const userId in usersData) {
+        const user = usersData[userId];
+        console.log(`Processing user: ${userId}`);
+
+        if (user.clinicAppointments) {
+          const updatedAppointments = user.clinicAppointments.filter(
+            (appointment) => appointment.date !== selectedDate
+          );
+
+          console.log(`Updated appointments for user ${userId}:`, updatedAppointments);
+
+          if (updatedAppointments.length > 0) {
+            await set(ref(db, `user/${userId}/clinicAppointments`), updatedAppointments);
+          } else {
+            await remove(ref(db, `user/${userId}/clinicAppointments`));
+          }
+          console.log(`Clinic appointments updated for user ${userId}`);
+        }
+      }
+      console.log(`Deleted clinicAppointments for ${selectedDate}`);
+    } else {
+      console.log("No users found in the database.");
+    }
+  } catch (error) {
+    console.error('Error deleting clinic date and appointments:', error);
+    throw error;
+  }
+};
+
+export const recordCancellation = async (selectedDate, cancellationReason) => {
+  try {
+    const app = getFirebaseApp();
+    const dbRef = ref(getDatabase(app));
+    const cancellationRef = child(dbRef, 'cancellationRecords');
+
+    const cancellationData = {
+      date: selectedDate,
+      reason: cancellationReason,
+      cancelledAt: new Date().toISOString(),
+    };
+    const newCancellationRef = push(cancellationRef);
+
+    await set(newCancellationRef, cancellationData);
+
+    console.log('Cancellation record saved successfully:', cancellationData);
+
+    return selectedDate;
+  } catch (error) {
+    console.error('Error saving cancellation record:', error);
+    throw error;
   }
 };

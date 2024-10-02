@@ -35,19 +35,35 @@ export default function Notifications() {
     }
   };
 
-  const renderNotification = ({ item }) => (
-    <View style={styles.notificationItem}>
-      <Text style={styles.title}>{item.title}</Text>
-      <Text>Date: {item.date}</Text>
-      <Text>Time: {item.Time}</Text>
-      <Text>Venue: {item.venue}</Text>
-      <Text>Doctor: {item.doctor}</Text>
-      <Pressable onPress={() => handleMarkAsRead(item.id)} style={styles.readButton}>
-        <Text>{item.read ? "Read" : "Mark as Read"}</Text>
-      </Pressable>
-      <Text style={styles.timestamp}>{new Date(item.date).toLocaleString()}</Text>
-    </View>
-  );
+  const renderNotification = ({ item }) => {
+    if (item.title) {
+      return (
+        <View style={styles.notificationItem}>
+          <Text style={styles.title}>{item.title}</Text>
+          <Text>Date: {item.date}</Text>
+          <Text>Time: {item.Time}</Text>
+          <Text>Venue: {item.venue}</Text>
+          <Text>Doctor: {item.doctor}</Text>
+          <Pressable onPress={() => handleMarkAsRead(item.id)} style={styles.readButton}>
+            <Text>{item.read ? "Read" : "Mark as Read"}</Text>
+          </Pressable>
+          <Text style={styles.timestamp}>{new Date(item.dateC).toLocaleString()}</Text>
+        </View>
+      );
+    } else {
+      return (
+        <View style={styles.notificationItem}>
+          <Text style={styles.title}>Clinic Appointment Cancelled</Text>
+          <Text>Cancelled Date: {item.clinicDate}</Text>
+          <Text>Reason: {item.reason}</Text>
+          <Pressable onPress={() => handleMarkAsRead(item.id)} style={styles.readButton}>
+            <Text>{item.read ? "Read" : "Mark as Read"}</Text>
+          </Pressable>
+          <Text style={styles.timestamp}>{new Date(item.date).toLocaleString()}</Text>
+        </View>
+      );
+    }
+  };
 
   return (
     <View style={styles.container}>

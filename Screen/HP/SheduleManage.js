@@ -4,7 +4,7 @@ import { getAllPatients, getUserClinicAppointments } from '../../utils/actions/u
 import { CheckBox } from 'react-native-elements';
 import { useNavigation } from '@react-navigation/native';
 
-export default function ScheduleManage() {
+export default function ScheduleManage({ navigate }) {
     const [patients, setPatients] = useState([]);
     const [selectedPatients, setSelectedPatients] = useState({});
     const navigation = useNavigation();
