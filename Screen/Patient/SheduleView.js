@@ -119,20 +119,22 @@ export default function ScheduleView() {
 
   return (
     <View style={styles.container}>
-      <Calendar
-        markedDates={markedDates}
-        onDayPress={handleDayPress}
-      />
-      <Pressable onPress={() => navigation.navigate("notifications")}>
-        <View style={styles.notificationIcon}>
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Schedules</Text>
+        <Pressable onPress={() => navigation.navigate("notifications")} style={styles.notificationIcon}>
           <Ionicons name="notifications-outline" size={24} color="black" />
           {unreadCount > 0 && (
             <View style={styles.badge}>
               <Text style={styles.badgeText}>{unreadCount}</Text>
             </View>
           )}
-        </View>
-      </Pressable>
+        </Pressable>
+      </View>
+      <Calendar
+        style={styles.calendarStyle}
+        markedDates={markedDates}
+        onDayPress={handleDayPress}
+      />
       {selectedDate && (
         <View style={styles.detailsSection}>
           <Text style={styles.sectionTitle}>Appointments for {selectedDate}</Text>
@@ -166,7 +168,19 @@ export default function ScheduleView() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#D9E4EC',
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 10,
+    backgroundColor: 'white',
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#003366',
   },
   detailsSection: {
     padding: 20,
@@ -216,22 +230,40 @@ const styles = StyleSheet.create({
   },
   notificationIcon: {
     position: 'relative',
-    marginRight: 20,
+    padding: 5,
   },
   badge: {
     position: 'absolute',
-    right: -10,
-    top: -5,
-    backgroundColor: 'red',
-    borderRadius: 10,
-    width: 20,
-    height: 20,
+    right: 0,
+    top: 0,
+    backgroundColor: '#FF4136',
+    borderRadius: 9,
+    minWidth: 18,
+    height: 18,
     justifyContent: 'center',
     alignItems: 'center',
+    paddingHorizontal: 3,
   },
   badgeText: {
     color: 'white',
     fontWeight: 'bold',
-    fontSize: 12,
+    fontSize: 11,
+    textAlign: 'center',
+  },
+  calendarStyle: {
+    alignSelf: 'center',
+    width: 380,
+    height: 350,
+    borderWidth: 1,
+    borderColor: 'black',
+    borderRadius: 10,
+    backgroundColor: 'white',
+    padding: 10,
+    margin: 20,
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.8,
+    shadowRadius: 5,
   },
 });

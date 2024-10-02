@@ -80,6 +80,7 @@ export default function HomePatient() {
         tabBarInactiveTintColor: 'rgba(128, 128, 128, 0.5)',
         tabBarStyle: styles.tabBar,
         tabBarIconStyle: styles.tabBarIcon,
+        headerShown: false,
       })}
     >
       <Tab.Screen name={DashboardScreen} component={DashboardStack} />
