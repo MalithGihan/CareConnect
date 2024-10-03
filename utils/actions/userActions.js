@@ -1,78 +1,78 @@
-import { child,get,getDatabase,ref , update ,push , set} from "firebase/database";
+import { child, get, getDatabase, ref, update, push, set, remove, addDoc } from "firebase/database";
 import { getFirebaseApp } from "../firebaseHelper";
 
 export const getUserData = async (userId) => {
-    try {
-        const app = getFirebaseApp()
+  try {
+    const app = getFirebaseApp()
 
-        const dbRef = ref(getDatabase(app))
+    const dbRef = ref(getDatabase(app))
 
-        const userRef = child(dbRef, `user/${userId}`)
+    const userRef = child(dbRef, `user/${userId}`)
 
-        const snapshot = await get(userRef)
+    const snapshot = await get(userRef)
 
-        return snapshot.val()
+    return snapshot.val()
 
-    } catch (err) {
-        console.error(err)
-    }
+  } catch (err) {
+    console.error(err)
+  }
 }
 
 export const getAllPatients = async () => {
-    try {
-        const app = getFirebaseApp();
-        const dbRef = ref(getDatabase(app));
-        const usersRef = child(dbRef, 'user');
-        
-        const snapshot = await get(usersRef);
+  try {
+    const app = getFirebaseApp();
+    const dbRef = ref(getDatabase(app));
+    const usersRef = child(dbRef, 'user');
 
-        if (snapshot.exists()) {
-            const usersData = snapshot.val();
-        
-            const patients = Object.keys(usersData)
-                .filter(userId => usersData[userId].role === 'patient')
-                .map(userId => ({
-                    id: userId,
-                    name: usersData[userId].name,
-                    email: usersData[userId].email,
-                    clinicDate: usersData[userId].clinicDate
-                }));
-            
-            return patients;
-        } else {
-            return [];
-        }
-    } catch (err) {
-        console.error("Error fetching patients:", err);
-        return [];
+    const snapshot = await get(usersRef);
+
+    if (snapshot.exists()) {
+      const usersData = snapshot.val();
+
+      const patients = Object.keys(usersData)
+        .filter(userId => usersData[userId].role === 'patient')
+        .map(userId => ({
+          id: userId,
+          name: usersData[userId].name,
+          email: usersData[userId].email,
+          clinicDate: usersData[userId].clinicDate
+        }));
+
+      return patients;
+    } else {
+      return [];
     }
+  } catch (err) {
+    console.error("Error fetching patients:", err);
+    return [];
+  }
 };
 
-export const updateClinicDate = async (userId, newClinicDate, doctor, venue, time) => {
+export const AddClinicDate = async (userId, newClinicDate, doctor, venue, time) => {
   try {
-      const app = getFirebaseApp();
-      const dbRef = ref(getDatabase(app));
-      const userRef = child(dbRef, `user/${userId}`);
-      
-      const snapshot = await get(userRef);
-      const userData = snapshot.val();
+    const app = getFirebaseApp();
+    const dbRef = ref(getDatabase(app));
+    const userRef = child(dbRef, `user/${userId}`);
 
-      const newClinicAppointment = {
-          date: newClinicDate,
-          doctor: doctor,
-          venue: venue,
-          time: time
-      };
+    const snapshot = await get(userRef);
+    const userData = snapshot.val();
 
-      const updatedAppointments = userData.clinicAppointments 
-          ? [...userData.clinicAppointments, newClinicAppointment] 
-          : [newClinicAppointment];
+    const newClinicAppointment = {
+      date: newClinicDate,
+      doctor: doctor,
+      venue: venue,
+      time: time
+    };
 
-      await update(userRef, { clinicAppointments: updatedAppointments });
-      console.log(`Clinic appointment updated for user ${userId}`);
+    const updatedAppointments = userData.clinicAppointments
+      ? [...userData.clinicAppointments, newClinicAppointment]
+      : [newClinicAppointment];
+
+    await update(userRef, { clinicAppointments: updatedAppointments });
+    console.log(`Clinic appointment updated for user ${userId}`);
   } catch (err) {
-      console.error("Error updating clinic appointment:", err);
-      throw err; 
+    console.error("Error updating clinic appointment:", err);
+    throw err;
   }
 };
 
@@ -90,57 +90,6 @@ export const getUserClinicAppointments = async (userId) => {
   }
 };
 
-export const updateClinicAppointmentNotes = async (userId, appointmentId, note) => {
-  try {
-    const app = getFirebaseApp();
-    const dbRef = ref(getDatabase(app));
-    const userRef = child(dbRef, `user/${userId}`);
-    const snapshot = await get(userRef);
-    const userData = snapshot.val();
-
-    const updatedAppointments = userData.clinicAppointments
-      ? userData.clinicAppointments.map((appointment) =>
-          appointment.id === appointmentId ? { ...appointment, note } : appointment
-        )
-      : [];
-
-    await update(userRef, { clinicAppointments: updatedAppointments });
-    console.log(`Clinic appointment note updated for user ${userId}`);
-  } catch (err) {
-    console.error("Error updating clinic appointment note:", err);
-    throw err;
-  }
-};
-
-export const updateAndFetchClinicAppointments = async (userId, newAppointment) => {
-  try {
-    await updateClinicDate(userId, newAppointment.date, newAppointment.doctor, newAppointment.venue, newAppointment.time);
-    return await getUserClinicAppointments(userId);
-  } catch (error) {
-    console.error("Error updating and fetching clinic appointments:", error);
-    throw error;
-  }
-};
-
-export const saveUserNote = async (userId, appointmentId, note) => {
-  try {
-    const app = getFirebaseApp();
-    const dbRef = ref(getDatabase(app));
-    const userRef = child(dbRef, `user/${userId}`);
-    const snapshot = await get(userRef);
-    const userData = snapshot.val();
-
-    const updatedAppointments = userData.clinicAppointments.map(appointment => 
-      appointment.id === appointmentId ? { ...appointment, note } : appointment
-    );
-
-    await update(userRef, { clinicAppointments: updatedAppointments });
-    console.log(`Note saved for user ${userId} for appointment ${appointmentId}`);
-  } catch (err) {
-    console.error("Error saving note:", err);
-    throw err;
-  }
-};
 
 export const addUserNote = async (userId, appointmentId, noteText) => {
   try {
@@ -195,51 +144,51 @@ export const getUserNotes = async (userId) => {
 
 export const fetchDoctors = async () => {
   try {
-      const app = getFirebaseApp();
-      const dbRef = ref(getDatabase(app));
-      const usersRef = child(dbRef, 'user');
+    const app = getFirebaseApp();
+    const dbRef = ref(getDatabase(app));
+    const usersRef = child(dbRef, 'user');
 
-      const snapshot = await get(usersRef);
+    const snapshot = await get(usersRef);
 
-      if (snapshot.exists()) {
-          const usersData = snapshot.val();
-      
-          const doctors = Object.keys(usersData)
-              .filter(userId => usersData[userId].role === 'doctor')
-              .map(userId => ({
-                  id: userId,
-                  name: usersData[userId].userName,
-                  specialty: usersData[userId].specialty 
-              }));
-          
-          return doctors;
-      } else {
-          return [];
-      }
-  } catch (err) {
-      console.error("Error fetching doctors:", err);
+    if (snapshot.exists()) {
+      const usersData = snapshot.val();
+
+      const doctors = Object.keys(usersData)
+        .filter(userId => usersData[userId].role === 'doctor')
+        .map(userId => ({
+          id: userId,
+          name: usersData[userId].userName,
+          specialty: usersData[userId].specialty
+        }));
+
+      return doctors;
+    } else {
       return [];
+    }
+  } catch (err) {
+    console.error("Error fetching doctors:", err);
+    return [];
   }
 };
 
 //
-export const addDateSlot = async (date, timeSlots) => {
+export const CreateDateSlots = async (date, timeSlots) => {
   try {
     const app = getFirebaseApp();
     const dbRef = ref(getDatabase(app));
-    
+
     const dateSlotRef = child(dbRef, `dateSlots/${date}`);
 
     const snapshot = await get(dateSlotRef);
     const existingSlotData = snapshot.val();
 
     if (existingSlotData && existingSlotData.timeslots) {
-      const updatedTimeSlots = [...new Set([...existingSlotData.timeslots, ...timeSlots])]; 
-      await update(dateSlotRef, { timeslots: updatedTimeSlots }); 
+      const updatedTimeSlots = [...new Set([...existingSlotData.timeslots, ...timeSlots])];
+      await update(dateSlotRef, { timeslots: updatedTimeSlots });
       console.log(`Time slots for ${date} updated successfully`);
     } else {
-   
-      await set(dateSlotRef, { timeslots: timeSlots }); 
+
+      await set(dateSlotRef, { timeslots: timeSlots });
       console.log(`Date slot added on ${date}`);
     }
     return date;
@@ -255,7 +204,7 @@ export const getDateSlots = async () => {
     const app = getFirebaseApp();
     const dbRef = ref(getDatabase(app));
     const dateSlotsRef = child(dbRef, 'dateSlots');
-    
+
     const snapshot = await get(dateSlotsRef);
     const dateSlotsData = snapshot.val();
 
@@ -271,27 +220,12 @@ export const getDateSlots = async () => {
 };
 
 
-export const updateDateSlot = async (dateSlotId, updatedTimeSlots) => {
-  try {
-    const app = getFirebaseApp();
-    const dbRef = ref(getDatabase(app));
-    const dateSlotRef = child(dbRef, `dateSlots/${dateSlotId}`);
-    
-    await update(dateSlotRef, { timeSlots: updatedTimeSlots });
-    console.log(`Date slot ${dateSlotId} updated`);
-  } catch (err) {
-    console.error("Error updating date slot:", err);
-    throw err;
-  }
-};
-
-
 export const deleteDateSlot = async (dateSlotId) => {
   try {
     const app = getFirebaseApp();
     const dbRef = ref(getDatabase(app));
     const dateSlotRef = child(dbRef, `dateSlots/${dateSlotId}`);
-    
+
     await update(dateSlotRef, null);
     console.log(`Date slot ${dateSlotId} deleted`);
   } catch (err) {
@@ -310,12 +244,12 @@ export const blockTimeSlot = async (date, time) => {
 
     const snapshot = await get(dateSlotRef);
     const existingSlotData = snapshot.val();
-    console.log("Existing Slot Data:", existingSlotData); 
+    console.log("Existing Slot Data:", existingSlotData);
 
     if (existingSlotData && existingSlotData.timeslots && existingSlotData.timeslots.timeslots) {
       const updatedTimeSlots = existingSlotData.timeslots.timeslots.map(slot => {
         if (slot.time === time) {
-          return { ...slot, booked: true }; 
+          return { ...slot, booked: true };
         }
         return slot;
       });
@@ -327,5 +261,159 @@ export const blockTimeSlot = async (date, time) => {
   } catch (error) {
     console.error('Error blocking time slot:', error);
     throw new Error('Failed to block time slot');
+  }
+};
+
+export const sendUserNotification = async (userId, notification) => {
+  try {
+    const db = getDatabase(getFirebaseApp());
+    const notificationsRef = ref(db, `user/${userId}/notifications`);
+
+    await push(notificationsRef, notification);
+    console.log(`Notification sent to user ${userId}`);
+  } catch (error) {
+    console.error("Error sending notification:", error);
+  }
+};
+
+export const getUserNotifications = async (userId) => {
+  try {
+    const db = getDatabase(getFirebaseApp());
+    const notificationsRef = ref(db, `user/${userId}/notifications`);
+
+    const snapshot = await get(notificationsRef);
+    if (snapshot.exists()) {
+      const notifications = [];
+      snapshot.forEach((childSnapshot) => {
+        notifications.push({
+          id: childSnapshot.key,
+          ...childSnapshot.val(),
+        });
+      });
+      console.log(`Notifications retrieved for user ${userId}:`, notifications);
+      return notifications;
+    } else {
+      console.log(`No notifications found for user ${userId}`);
+      return [];
+    }
+  } catch (error) {
+    console.error("Error retrieving notifications:", error);
+    return [];
+  }
+};
+
+export const markNotificationAsRead = async (userId, notificationId) => {
+  try {
+    const db = getDatabase(getFirebaseApp());
+    const notificationRef = ref(db, `user/${userId}/notifications/${notificationId}`);
+
+    await update(notificationRef, { read: true });
+    console.log(`Notification ${notificationId} marked as read for user ${userId}`);
+  } catch (error) {
+    console.error("Error marking notification as read:", error);
+  }
+};
+
+export const getPatientsByClinicDate = async (date) => {
+  try {
+    const app = getFirebaseApp();
+    const dbRef = ref(getDatabase(app));
+    const usersRef = child(dbRef, 'user');
+    const snapshot = await get(usersRef);
+
+    if (snapshot.exists()) {
+      const usersData = snapshot.val();
+      const patients = [];
+
+      Object.keys(usersData).forEach(userId => {
+        const user = usersData[userId];
+        if (user.role === 'patient') {
+          const clinicAppointments = user.clinicAppointments || [];
+          clinicAppointments.forEach(appointment => {
+            if (appointment.date === date) {
+              patients.push({
+                id: userId,
+                name: user.name,
+                email: user.email,
+                clinicDate: appointment.date,
+              });
+            }
+          });
+        }
+      });
+      return patients;
+    } else {
+      return [];
+    }
+  } catch (err) {
+    console.error("Error fetching patients for date:", err);
+    return [];
+  }
+};
+
+export const deleteClinicDateAndAppointments = async (selectedDate) => {
+  try {
+    const app = getFirebaseApp();
+    const db = getDatabase(app);
+    const dateSlotRef = ref(db, `dateSlots/${selectedDate}`);
+    await remove(dateSlotRef);
+    console.log(`Deleted dateSlot for ${selectedDate}`);
+
+    const usersRef = ref(db, 'user');
+    const snapshot = await get(usersRef);
+
+    if (snapshot.exists()) {
+      const usersData = snapshot.val();
+
+      for (const userId in usersData) {
+        const user = usersData[userId];
+        console.log(`Processing user: ${userId}`);
+
+        if (user.clinicAppointments) {
+          const updatedAppointments = user.clinicAppointments.filter(
+            (appointment) => appointment.date !== selectedDate
+          );
+
+          console.log(`Updated appointments for user ${userId}:`, updatedAppointments);
+
+          if (updatedAppointments.length > 0) {
+            await set(ref(db, `user/${userId}/clinicAppointments`), updatedAppointments);
+          } else {
+            await remove(ref(db, `user/${userId}/clinicAppointments`));
+          }
+          console.log(`Clinic appointments updated for user ${userId}`);
+        }
+      }
+      console.log(`Deleted clinicAppointments for ${selectedDate}`);
+    } else {
+      console.log("No users found in the database.");
+    }
+  } catch (error) {
+    console.error('Error deleting clinic date and appointments:', error);
+    throw error;
+  }
+};
+
+export const recordCancellation = async (selectedDate, cancellationReason) => {
+  try {
+    const app = getFirebaseApp();
+    const dbRef = ref(getDatabase(app));
+    const cancellationRef = child(dbRef, 'cancellationRecords');
+
+    const cancellationData = {
+      date: selectedDate,
+      reason: cancellationReason,
+      cancelledAt: new Date().toISOString(),
+    };
+    const newCancellationRef = push(cancellationRef);
+
+    await set(newCancellationRef, cancellationData);
+
+    console.log('Cancellation record saved successfully:', cancellationData);
+
+    return selectedDate;
+  } catch (error) {
+    console.error('Error saving cancellation record:', error);
+    throw error;
   }
 };

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, FlatList, TouchableOpacity, ToastAndroid, Alert } from 'react-native';
+import { StyleSheet, View, Text, FlatList, TouchableOpacity, ToastAndroid, Alert, Pressable } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import { useSelector } from 'react-redux';
-import { getUserClinicAppointments, getUserNotes } from '../../utils/actions/userActions';
+import { getUserClinicAppointments, getUserNotes, getUserNotifications } from '../../utils/actions/userActions';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -11,6 +11,7 @@ export default function ScheduleView() {
   const [appointments, setAppointments] = useState([]);
   const [notes, setNotes] = useState({});
   const [selectedDate, setSelectedDate] = useState(null);
+  const [unreadCount, setUnreadCount] = useState(0);
   const userData = useSelector((state) => state.auth.userData);
   const navigation = useNavigation();
 
@@ -18,6 +19,7 @@ export default function ScheduleView() {
     if (userData && userData.userId) {
       fetchAndDisplayClinicAppointments(userData.userId);
       fetchUserNotes(userData.userId);
+      fetchUserNotifications(userData.userId);
     }
   }, [userData]);
 
@@ -25,6 +27,7 @@ export default function ScheduleView() {
     React.useCallback(() => {
       if (userData && userData.userId) {
         fetchUserNotes(userData.userId);
+        fetchUserNotifications(userData.userId);
       }
     }, [userData])
   );
@@ -62,6 +65,17 @@ export default function ScheduleView() {
     } catch (error) {
       console.error("Error fetching user notes:", error);
       Alert.alert("Error", "Failed to fetch notes. Please try again.");
+    }
+  };
+
+  const fetchUserNotifications = async (userId) => {
+    try {
+      const notifications = await getUserNotifications(userId);
+      const unreadNotifications = notifications.filter(notification => !notification.read);
+      setUnreadCount(unreadNotifications.length);
+    } catch (error) {
+      console.error("Error fetching user notifications:", error);
+      Alert.alert("Error", "Failed to fetch notifications. Please try again.");
     }
   };
 
@@ -105,7 +119,19 @@ export default function ScheduleView() {
 
   return (
     <View style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Schedules</Text>
+        <Pressable onPress={() => navigation.navigate("notifications")} style={styles.notificationIcon}>
+          <Ionicons name="notifications-outline" size={24} color="black" />
+          {unreadCount > 0 && (
+            <View style={styles.badge}>
+              <Text style={styles.badgeText}>{unreadCount}</Text>
+            </View>
+          )}
+        </Pressable>
+      </View>
       <Calendar
+        style={styles.calendarStyle}
         markedDates={markedDates}
         onDayPress={handleDayPress}
       />
@@ -128,8 +154,8 @@ export default function ScheduleView() {
         </View>
       )}
       {isClinicDate && (
-        <TouchableOpacity 
-          style={styles.floatingButton} 
+        <TouchableOpacity
+          style={styles.floatingButton}
           onPress={handleAddNotePress}
         >
           <Ionicons name="add" size={30} color="white" />
@@ -142,7 +168,19 @@ export default function ScheduleView() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#D9E4EC',
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 10,
+    backgroundColor: 'white',
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#003366',
   },
   detailsSection: {
     padding: 20,
@@ -189,5 +227,43 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
+  },
+  notificationIcon: {
+    position: 'relative',
+    padding: 5,
+  },
+  badge: {
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    backgroundColor: '#FF4136',
+    borderRadius: 9,
+    minWidth: 18,
+    height: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 3,
+  },
+  badgeText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 11,
+    textAlign: 'center',
+  },
+  calendarStyle: {
+    alignSelf: 'center',
+    width: 380,
+    height: 350,
+    borderWidth: 1,
+    borderColor: 'black',
+    borderRadius: 10,
+    backgroundColor: 'white',
+    padding: 10,
+    margin: 20,
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.8,
+    shadowRadius: 5,
   },
 });

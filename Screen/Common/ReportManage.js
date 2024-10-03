@@ -1,13 +1,12 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import React from 'react';
+import { View ,Text} from 'react-native'
 
-export default ReportManage = () => {
-  return (
-    <View>
-      <Text>ReportManage</Text>
-    </View>
-  )
+export default function ReportManage() {
+
+    return (
+        <View>
+           <Text> Report</Text>
+        </View>
+    );
 }
 
-
-const styles = StyleSheet.create({})

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, Button, ScrollView, TextInput } from 'react-native';
 import { Calendar } from 'react-native-calendars';
-import { updateClinicDate, fetchDoctors, getDateSlots, blockTimeSlot } from '../../utils/actions/userActions';
+import { AddClinicDate, fetchDoctors, getDateSlots, blockTimeSlot, sendUserNotification } from '../../../utils/actions/userActions';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Picker } from '@react-native-picker/picker';
 import Toast from 'react-native-toast-message';
@@ -60,10 +60,18 @@ export default function ClinicDateSelection() {
 
     const onDayPress = (day) => {
         const newSelectedDate = day.dateString;
+        if (!dateSlots[newSelectedDate] || !dateSlots[newSelectedDate].timeslots || dateSlots[newSelectedDate].timeslots.timeslots.every(slot => slot.booked)) {
+            Toast.show({
+                type: 'error',
+                text1: 'Date Not Available',
+                text2: 'Please select a date with available time slots.',
+            });
+            return;
+        }
+
         setSelectedDate(newSelectedDate);
         setTime('');
         setPatientTimes([]);
-
 
         const slots = fetchAvailableTimeSlots(dateSlots, newSelectedDate);
         setAvailableTimeSlots(slots);
@@ -96,19 +104,34 @@ export default function ClinicDateSelection() {
         }
     };
 
-    const handleUpdateClinicDate = async () => {
+    const handleAddClinicDate = async () => {
         if (selectedDate && doctor && venue && time) {
             try {
                 setLoading(true);
                 const promises = selectedPatientIds.map((id, index) => {
                     const appointmentTime = index === 0 ? time : patientTimes[index];
-                    return updateClinicDate(id, selectedDate, doctor, venue, appointmentTime);
+                    return AddClinicDate(id, selectedDate, doctor, venue, appointmentTime);
                 });
                 await Promise.all(promises);
                 await blockTimeSlot(selectedDate, time);
                 if (secondPatientTime) {
                     await blockTimeSlot(selectedDate, secondPatientTime);
                 }
+                const notificationPromises = selectedPatientIds.map((id, index) => {
+                    const appointmentTime = index === 0 ? time : patientTimes[index];
+                    const notification = {
+                        title: 'Your Clinic Appointment has been Scheduled.',
+                        date: `${selectedDate}`,
+                        Time: `${appointmentTime}`,
+                        venue: `${venue}`,
+                        doctor: `Dr. ${doctor}`,
+                        dateC: new Date().toISOString(),
+                        read: false,
+                    };
+                    return sendUserNotification(id, notification);
+                });
+                await Promise.all(notificationPromises);
+
                 const updatedSlots = {
                     ...dateSlots,
                     [selectedDate]: {
@@ -127,7 +150,7 @@ export default function ClinicDateSelection() {
                 Toast.show({
                     type: 'success',
                     text1: 'Success',
-                    text2: 'Clinic dates updated for selected patients.'
+                    text2: 'Clinic dates and notifications updated for selected patients.'
                 });
                 navigation.goBack();
             } catch (error) {
@@ -152,7 +175,6 @@ export default function ClinicDateSelection() {
     return (
         <ScrollView>
             <View style={styles.container}>
-
                 <Text>Selected Patients: {selectedPatientIds.length}</Text>
 
                 <Calendar
@@ -208,11 +230,10 @@ export default function ClinicDateSelection() {
 
                 <Button
                     title={loading ? "Updating..." : "Update Clinic Date for Selected Patients"}
-                    onPress={handleUpdateClinicDate}
+                    onPress={handleAddClinicDate}
                     disabled={!selectedDate || !doctor || !venue || !time || loading}
                 />
                 <Toast />
-
             </View>
         </ScrollView>
     );
