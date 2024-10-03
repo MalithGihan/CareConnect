@@ -8,13 +8,15 @@ import QRscanner from '../Common/QRscanner';
 import HPProfile from './HPProfile';
 import SheduleManage from './SheduleManage';
 import ReportManage from '../Common/ReportManage';
-import ClinicDateSelection from '../HP/ClinicDateSelection'
+import ClinicDateSelection from './SchduleMangement.js/ClinicDateSelection';
+import HomeScreenHP from '../HP/HomeScreenHP';
 
 const DashboardScreen = 'DashboardHP'
 const SheduleManageScreen = 'SearchPatient'
 const ProfileScreen = 'DProfile'
 const PateintReportScannerScreen = 'QRscanner'
 const ReportManageScreen = 'ReportManage'
+const ClinicScreen = 'HomeScreenHP';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -22,7 +24,8 @@ const Stack = createStackNavigator();
 function DashboardStack() {
   return (
     <Stack.Navigator>
-        <Stack.Screen name='Dashbord' component={DashboardHP} options={{headerShown:false}} />
+      <Stack.Screen name='Dashbord' component={DashboardHP} options={{ headerShown: false }} />
+      <Stack.Screen name="Clinic" component={HomeScreenHP} options={{ headerShown: false }} />
     </Stack.Navigator>
   )
 }
@@ -30,7 +33,7 @@ function DashboardStack() {
 function QRScanStack() {
   return (
     <Stack.Navigator>
-        <Stack.Screen name='QR Scanner' component={QRscanner} options={{headerShown:false}} />
+      <Stack.Screen name='QR Scanner' component={QRscanner} options={{ headerShown: false }} />
     </Stack.Navigator>
   )
 }
@@ -38,8 +41,7 @@ function QRScanStack() {
 function ReportManageStack() {
   return (
     <Stack.Navigator>
-        <Stack.Screen name='Clinic Shedule' component={SheduleManage} options={{headerShown:false}} />
-        <Stack.Screen name="ClinicDateSelection" component={ClinicDateSelection} />
+      <Stack.Screen name='Clinic Shedule' component={SheduleManage} options={{ headerShown: false }} />
     </Stack.Navigator>
   )
 }
@@ -47,7 +49,7 @@ function ReportManageStack() {
 function SheduleManageStack() {
   return (
     <Stack.Navigator>
-        <Stack.Screen name='Patient Report Manage' component={ReportManage} options={{headerShown:false}} />
+      <Stack.Screen name='Patient Report Manage' component={ReportManage} options={{ headerShown: false }} />
     </Stack.Navigator>
   )
 }
@@ -55,11 +57,18 @@ function SheduleManageStack() {
 function ProfileManageStack() {
   return (
     <Stack.Navigator>
-        <Stack.Screen name='Profile Manage' component={HPProfile} options={{headerShown:false}} />
+      <Stack.Screen name='Profile Manage' component={HPProfile} options={{ headerShown: false }} />
     </Stack.Navigator>
   )
 }
-
+function ClinicMangementStack() {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen name="Clinic" component={HomeScreenHP} options={{ headerShown: false }} />
+      <Stack.Screen name="ClinicDateSelection" component={ClinicDateSelection} />
+    </Stack.Navigator>
+  );
+}
 export default function HomeHP() {
   return (
     <Tab.Navigator
@@ -69,16 +78,18 @@ export default function HomeHP() {
           let iconName;
 
           if (route.name === DashboardScreen) {
-            iconName = focused ? 'language' : 'language-outline';
+            iconName = focused ? 'home' : 'home-outline'; 
           } else if (route.name === ProfileScreen) {
-            iconName = focused ? 'person' : 'person-outline';
+            iconName = focused ? 'person' : 'person-outline'; 
           } else if (route.name === SheduleManageScreen) {
-            iconName = focused ? 'globe' : 'globe-outline';
+            iconName = focused ? 'calendar' : 'calendar-outline'; 
           } else if (route.name === PateintReportScannerScreen) {
-            iconName = focused ? 'globe' : 'globe-outline';
-          }  else if (route.name === ReportManageScreen) {
-            iconName = focused ? 'globe' : 'globe-outline';
-          } 
+            iconName = focused ? 'camera' : 'camera-outline'; 
+          } else if (route.name === ReportManageScreen) {
+            iconName = focused ? 'document' : 'document-outline';
+          } else if (route.name === ClinicScreen) {
+            iconName = focused ? 'medkit' : 'medkit-outline';
+          }
           return <Ionicons name={iconName} size={size} color={color} />;
         },
         tabBarShowLabel: false,
@@ -93,8 +104,8 @@ export default function HomeHP() {
       <Tab.Screen name={PateintReportScannerScreen} component={QRScanStack} />
       <Tab.Screen name={ReportManageScreen} component={ReportManageStack} />
       <Tab.Screen name={SheduleManageScreen} component={SheduleManageStack} />
+      <Tab.Screen name={ClinicScreen} component={ClinicMangementStack} />
       <Tab.Screen name={ProfileScreen} component={ProfileManageStack} />
-      
     </Tab.Navigator>
   );
 }

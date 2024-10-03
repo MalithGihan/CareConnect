@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, Button, ScrollView, TextInput } from 'react-native';
 import { Calendar } from 'react-native-calendars';
-import { AddClinicDate, fetchDoctors, getDateSlots, blockTimeSlot, sendUserNotification } from '../../utils/actions/userActions';
+import { AddClinicDate, fetchDoctors, getDateSlots, blockTimeSlot, sendUserNotification } from '../../../utils/actions/userActions';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Picker } from '@react-native-picker/picker';
 import Toast from 'react-native-toast-message';
