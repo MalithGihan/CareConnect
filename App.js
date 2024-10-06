@@ -8,10 +8,11 @@ import DefaultHome from "./Screen/DefaultHome";
 import OnboardingContext from "./Onboarding/OnboardingContext";
 import { Provider } from "react-redux";
 import { SignIn } from "./Screen/Login";
-import {SignUp} from "./Screen/Login";
+import { SignUp } from "./Screen/Login";
 import HomeDoctor from "./Screen/Doctor/HomeDoctor";
 import HomeHP from "./Screen/HP/HomeHP";
 import HomePatient from "./Screen/Patient/HomePatient";
+import SigninAdmim from "./Screen/Login/SiginAdmin";
 
 import { store } from "./store/store";
 
@@ -32,14 +33,15 @@ const OnboardingStack = () => (
 
 const MainStack = () => (
   <Provider store={store}>
-  <Stack.Navigator screenOptions={{ headerShown: false }}>
-    <Stack.Screen name="Default Home" component={DefaultHome} />
-    <Stack.Screen name="Sign In" component={SignIn} />
-    <Stack.Screen name="Sign Up" component={SignUp} />
-    <Stack.Screen name="Home Doctor" component={HomeDoctor} />
-    <Stack.Screen name="Home Healthcare Provider" component={HomeHP} />
-    <Stack.Screen name="Home Patient" component={HomePatient} />
-  </Stack.Navigator>
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="Default Home" component={DefaultHome} />
+      <Stack.Screen name="Sign In" component={SignIn} />
+      <Stack.Screen name="Signin Admin" component={SigninAdmim} />
+      <Stack.Screen name="Sign Up" component={SignUp} />
+      <Stack.Screen name="Home Doctor" component={HomeDoctor} />
+      <Stack.Screen name="Home Healthcare Provider" component={HomeHP} />
+      <Stack.Screen name="Home Patient" component={HomePatient} />
+    </Stack.Navigator>
   </Provider>
 );
 
