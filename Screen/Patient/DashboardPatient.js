@@ -1,17 +1,33 @@
 import { StyleSheet, Text, View, FlatList, Image, Alert, Dimensions, TouchableOpacity, Pressable, ScrollView } from 'react-native';
 import React, { useState, useEffect } from 'react';
-import { fetchNewsFeed } from "../../utils/actions/userActions";
+import { fetchNewsFeed, getUserNotifications } from "../../utils/actions/userActions";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
+import { Ionicons } from '@expo/vector-icons';
+import { useSelector } from 'react-redux';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 
 export default function DashboardPatient() {
   const [newsFeedItems, setNewsFeedItems] = useState([]);
   const [featuredItems, setFeaturedItems] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
   const [activeIndex, setActiveIndex] = useState(0);
+  
+  const userData = useSelector((state) => state.auth.userData);
+  const navigation = useNavigation();
 
   useEffect(() => {
     fetchAllNewsFeed();
-  }, []);
+    fetchUserNotifications(userData.userId);
+  }, [userData]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      if (userData && userData.userId) {
+        fetchUserNotifications(userData.userId);
+      }
+    }, [userData])
+  );
 
   const fetchAllNewsFeed = async () => {
     try {
@@ -21,6 +37,16 @@ export default function DashboardPatient() {
     } catch (error) {
       console.error('Error fetching news feed:', error);
       Alert.alert('Error', 'Failed to fetch news feed items');
+    }
+  };
+  const fetchUserNotifications = async (userId) => {
+    try {
+      const notifications = await getUserNotifications(userId);
+      const unreadNotifications = notifications.filter(notification => !notification.read);
+      setUnreadCount(unreadNotifications.length);
+    } catch (error) {
+      console.error("Error fetching user notifications:", error);
+      Alert.alert("Error", "Failed to fetch notifications. Please try again.");
     }
   };
 
@@ -40,7 +66,15 @@ export default function DashboardPatient() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Medical News</Text>
+        <Text style={styles.headerTitle}>News Feed</Text>
+        <Pressable onPress={() => navigation.navigate("notifications")} style={styles.notificationIcon}>
+          <Ionicons name="notifications-outline" size={24} color="black" />
+          {unreadCount > 0 && (
+            <View style={styles.badge}>
+              <Text style={styles.badgeText}>{unreadCount}</Text>
+            </View>
+          )}
+        </Pressable>
       </View>
       <ScrollView>
         <View>
@@ -112,7 +146,7 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: 'row',
-    justifyContent: 'flex-start',
+    justifyContent: 'space-between',
     alignItems: 'center',
     padding: 10,
     backgroundColor: 'white',
@@ -248,6 +282,28 @@ const styles = StyleSheet.create({
     marginTop: 10,
     width: '90%',
     alignSelf: 'center',
+  },
+  notificationIcon: {
+    position: 'relative',
+    padding: 5,
+  },
+  badge: {
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    backgroundColor: '#FF4136',
+    borderRadius: 9,
+    minWidth: 18,
+    height: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 3,
+  },
+  badgeText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 11,
+    textAlign: 'center',
   }
 
 });
