@@ -10,6 +10,7 @@ import SheduleManage from './SheduleManage';
 import ReportManage from '../Common/ReportManage';
 import ClinicDateSelection from './SchduleMangement.js/ClinicDateSelection';
 import HomeScreenHP from '../HP/HomeScreenHP';
+import UserCreate from './UserCreate';
 
 const DashboardScreen = 'DashboardHP'
 const SheduleManageScreen = 'SearchPatient'
@@ -17,6 +18,8 @@ const ProfileScreen = 'DProfile'
 const PateintReportScannerScreen = 'QRscanner'
 const ReportManageScreen = 'ReportManage'
 const ClinicScreen = 'HomeScreenHP';
+const UserCreatescreen = 'UserCreate';
+
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -69,6 +72,14 @@ function ClinicMangementStack() {
     </Stack.Navigator>
   );
 }
+
+function UserMangementStack() {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen name="UserCreate" component={UserCreate} options={{ headerShown: false }} />
+    </Stack.Navigator>
+  );
+}
 export default function HomeHP() {
   return (
     <Tab.Navigator
@@ -87,7 +98,9 @@ export default function HomeHP() {
             iconName = focused ? 'camera' : 'camera-outline'; 
           } else if (route.name === ReportManageScreen) {
             iconName = focused ? 'document' : 'document-outline';
-          } else if (route.name === ClinicScreen) {
+          } else if (route.name === UserCreatescreen) {
+            iconName = focused ? 'medkit' : 'medkit-outline';
+          }else if (route.name === ClinicScreen) {
             iconName = focused ? 'medkit' : 'medkit-outline';
           }
           return <Ionicons name={iconName} size={size} color={color} />;
@@ -104,6 +117,7 @@ export default function HomeHP() {
       <Tab.Screen name={PateintReportScannerScreen} component={QRScanStack} />
       <Tab.Screen name={ReportManageScreen} component={ReportManageStack} />
       <Tab.Screen name={SheduleManageScreen} component={SheduleManageStack} />
+      <Tab.Screen name={UserCreatescreen} component={UserMangementStack} />
       <Tab.Screen name={ClinicScreen} component={ClinicMangementStack} />
       <Tab.Screen name={ProfileScreen} component={ProfileManageStack} />
     </Tab.Navigator>

@@ -417,3 +417,84 @@ export const recordCancellation = async (selectedDate, cancellationReason) => {
     throw error;
   }
 };
+
+export const addNewsItem = async (title, description, date, imageUrl = null) => {
+  try {
+    const app = getFirebaseApp();
+    const dbRef = ref(getDatabase(app));
+    const newsFeedRef = child(dbRef, 'newsFeed');
+
+    const newNewsItem = {
+      title,
+      description,
+      date: date,
+      imageUrl,  
+      createdAt: Date.now()
+    };
+
+    const newNewsRef = push(newsFeedRef);
+    await set(newNewsRef, newNewsItem);
+
+    console.log("News feed item successfully added:", newNewsItem);
+    return newNewsItem;
+  } catch (err) {
+    console.error("Error adding news feed item:", err.message);
+    throw new Error("Failed to add news feed item.");
+  }
+};
+
+
+export const fetchNewsFeed = async () => {
+  try {
+    const app = getFirebaseApp();
+    const dbRef = ref(getDatabase(app));
+    const newsFeedRef = child(dbRef, 'newsFeed');
+
+    const snapshot = await get(newsFeedRef);
+
+    if (snapshot.exists()) {
+      const newsFeedData = snapshot.val();
+      const newsItems = Object.keys(newsFeedData).map(newsId => ({
+        id: newsId,
+        ...newsFeedData[newsId]
+      }));
+
+      console.log("News feed items fetched:", newsItems);
+      return newsItems;
+    } else {
+      console.log("No news feed items found.");
+      return [];
+    }
+  } catch (err) {
+    console.error("Error fetching news feed items:", err);
+    throw err;
+  }
+};
+
+export const deleteNewsFeedItem = async (newsId) => {
+  try {
+    const app = getFirebaseApp();
+    const dbRef = ref(getDatabase(app));
+    const newsItemRef = child(dbRef, `newsFeed/${newsId}`);
+
+    await remove(newsItemRef);
+    console.log(`News feed item ${newsId} deleted.`);
+  } catch (err) {
+    console.error("Error deleting news feed item:", err);
+    throw err;
+  }
+};
+
+export const updateNewsFeedItem = async (newsId, updatedFields) => {
+  try {
+    const app = getFirebaseApp();
+    const dbRef = ref(getDatabase(app));
+    const newsItemRef = child(dbRef, `newsFeed/${newsId}`);
+
+    await update(newsItemRef, updatedFields);
+    console.log(`News feed item ${newsId} updated with fields:`, updatedFields);
+  } catch (err) {
+    console.error("Error updating news feed item:", err);
+    throw err;
+  }
+};

@@ -14,13 +14,13 @@ export default function DashboardHP() {
         </Pressable>
       </BlurView>
       <BlurView intensity={50} style={styles.glassButton}>
-        <Pressable onPress={() => alert('Button 2')}>
-          <Text style={styles.buttonText}>Button 2</Text>
+        <Pressable onPress={() => navigation.navigate('Clinic Shedule')}>
+          <Text style={styles.buttonText}>News Management</Text>
         </Pressable>
       </BlurView>
       <BlurView intensity={50} style={styles.glassButton}>
         <Pressable onPress={() => alert('Button 3')}>
-          <Text style={styles.buttonText}>Button 3</Text>
+          <Text style={styles.buttonText}>User Management</Text>
         </Pressable>
       </BlurView>
       <BlurView intensity={50} style={styles.glassButton}>
