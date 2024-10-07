@@ -5,6 +5,7 @@ import { getUserNotifications, markNotificationAsRead } from '../../utils/action
 import Entypo from '@expo/vector-icons/Entypo';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useNavigation } from '@react-navigation/native';
+import { LinearGradient } from 'expo-linear-gradient';
 
 export default function Notifications() {
   const userData = useSelector((state) => state.auth.userData);
@@ -115,14 +116,15 @@ export default function Notifications() {
         <MaterialIcons onPress={() => navigation.goBack()} name="arrow-back-ios-new" size={24} color="#003366" />
         <Text style={styles.headerTitle}>Notifications</Text>
       </View>
-      <View style={styles.notificationcontainer} >
+      <LinearGradient
+            colors={['rgba(0, 51, 102, 0.2)', 'rgba(0, 191, 165, 0.2)']} style={styles.notificationcontainer} >
         <FlatList
           data={notifications}
           renderItem={renderNotification}
           keyExtractor={(item) => item.id}
           ListEmptyComponent={<Text>No notifications available.</Text>}
         />
-      </View>
+      </LinearGradient>
     </View>
   );
 }
@@ -137,7 +139,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     alignItems: 'center',
     padding: 10,
-    backgroundColor: 'white',
+    backgroundColor: '#D9E4EC',
   },
   headerTitle: {
     fontSize: 20,
@@ -157,7 +159,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
     marginBottom: 10,
-    borderRadius: 20,
+    borderRadius: 15,
     borderColor: 'black',
     elevation: 8,
     shadowColor: '#000',
@@ -221,7 +223,7 @@ const styles = StyleSheet.create({
     height: '87%',
     backgroundColor: 'white',
     alignSelf: 'center',
-    borderRadius: 20,
+    borderRadius: 25,
     borderColor: 'black',
     elevation: 5,
     shadowColor: '#000',
