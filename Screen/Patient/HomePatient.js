@@ -25,6 +25,7 @@ function DashboardStack() {
   return (
     <Stack.Navigator>
       <Stack.Screen name='Dashbord' component={Dashboard} options={{ headerShown: false }} />
+      <Stack.Screen name='notifications' component={Notifications} options={{ headerShown: false }} />
     </Stack.Navigator>
   )
 }

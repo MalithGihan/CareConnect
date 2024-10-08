@@ -69,7 +69,7 @@ export default SignIn = () => {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
       <ScrollView style={{ flex: 1, backgroundColor: 'white', padding: 16 }}>
-        <Text style={{ color: 'black', fontSize: 17, fontWeight: '700', marginBottom: 2 }}>Sign In</Text>
+        <Text style={{ color: 'black', fontSize: 17, fontWeight: '700', marginBottom: 2 }}>User Sign In</Text>
         <Text style={{ color: 'black', fontSize: 15, fontWeight: '400' }}>Sign in now to access your account.</Text>
         <View style={{ marginVertical: 22 }}>
           <CustomInput 
