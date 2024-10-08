@@ -4,7 +4,7 @@ import React from 'react'
 export default CommonNavBtn = (props) => {
   return (
     <TouchableOpacity style={{...styles.btn,...props.style}} onPress={props.onPress}>
-            <Text style={{fontSize: 15,color:'black',fontWeight:'bold'}}>
+            <Text style={{fontSize: 15,color:'white',fontWeight:'bold'}}>
               {props.title}
             </Text>
     </TouchableOpacity>
@@ -14,12 +14,10 @@ export default CommonNavBtn = (props) => {
 const styles = StyleSheet.create({
    btn : {
     paddingHorizontal: 20,
-    paddingVertical: 5,
-    borderWidth: 2,
-    borderRadius: 10,
+    paddingVertical: 8,
+    borderRadius: 50,
     alignItems: 'center',
     justifyContent: 'center',
-    borderColor: 'black',
     marginTop: 20,
    }
 })
