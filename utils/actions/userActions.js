@@ -551,11 +551,11 @@ export const fetchAppointmentsForToday = async (setAppointments) => {
 
   try {
     const db = getDatabase();
-    const today = new Date().toISOString().split('T')[0];
-    // const yesterday = new Date();
-    // const tomorrow = new Date(yesterday);
-    // tomorrow.setDate(yesterday.getDate() + 1);
-    // const today = tomorrow.toISOString().split('T')[0];
+    // const today = new Date().toISOString().split('T')[0];
+    const yesterday = new Date();
+    const tomorrow = new Date(yesterday);
+    tomorrow.setDate(yesterday.getDate() + 3);
+    const today = tomorrow.toISOString().split('T')[0];
 
     const dateRef = ref(db, `user/${userId}/clinicDates/`);
     const snapshot = await get(dateRef);
@@ -787,4 +787,175 @@ export const fetchAppointments = (setAppointments) => {
       console.log(`No appointments found for user ${userId}`);
     }
   });
+};
+
+export const fetchPatientDetails = async (patientId) => {
+  const db = getDatabase();
+  const patientRef = ref(db, `user/${patientId}`);
+  const snapshot = await get(patientRef);
+
+  if (snapshot.exists()) {
+    const data = snapshot.val();
+    return {
+      username: data.userName || '',
+      dateOfBirth: data.dateOfBrirth || '',
+      address: data.address || ''
+    };
+  } else {
+    console.log('No patient data available');
+    return { username: '', dateOfBirth: '', address: '' };
+  }
+};
+
+
+export const handleEditNote = async (patientId, appointmentKey, noteId, updatedNote, updatedDiagnosis, updatedMedications) => {
+  const db = getDatabase();
+  const noteRef = ref(db, `user/${patientId}/clinicAppointments/${appointmentKey}/notes/${noteId}`);
+  await update(noteRef, {
+    note: updatedNote,
+    diagnosis: updatedDiagnosis,
+    medications: updatedMedications
+  });
+};
+
+export const handleDeleteNote = async (patientId, appointmentKey, noteId, setPrescriptions) => {
+  const db = getDatabase();
+  const noteRef = ref(db, `user/${patientId}/clinicAppointments/${appointmentKey}/notes/${noteId}`);
+  await remove(noteRef);
+
+  setPrescriptions(prev => prev.filter(note => note.id !== noteId));
+};
+
+export const fetchAppointment = (patientId, setAppointments) => {
+  if (!patientId) return;
+
+  const db = getDatabase();
+  const appointmentsRef = ref(db, `user/${patientId}/clinicAppointments/`);
+
+  onValue(appointmentsRef, (snapshot) => {
+    if (snapshot.exists()) {
+      const data = snapshot.val();
+      const appointmentsArray = Object.entries(data).map(([key, value]) => ({
+        id: key,
+        ...value
+      }));
+      setAppointments(appointmentsArray);
+    } else {
+      console.log(`No appointments found for patient ${patientId}`);
+    }
+  });
+};
+
+export const updatePrescription = async (patientId, appointmentKey, prescriptionId, note, diagnosis, medications) => {
+  if (!appointmentKey) {
+    console.error('Appointment key is not available, cannot update prescription');
+    return;
+  }
+
+  if (note.trim() === '' || diagnosis.trim() === '' || medications.trim() === '') {
+    alert('All fields are required');
+    return;
+  }
+
+  try {
+    const db = getDatabase();
+    const prescriptionRef = ref(db, `user/${patientId}/clinicAppointments/${appointmentKey}/doctors_prescription/${prescriptionId}`);
+
+    const updatedPrescription = {
+      note,
+      diagnosis,
+      medications,
+      updatedAt: new Date().toISOString(),
+    };
+
+    await update(prescriptionRef, updatedPrescription);
+    alert('Prescription updated successfully');
+  } catch (error) {
+    console.error('Error updating prescription:', error);
+    alert('Error updating prescription');
+  }
+};
+
+export const fetchDoctorPrescriptions = async (patientId, appointmentKey, setPrescriptions) => {
+  const db = getDatabase();
+  const prescriptionRef = ref(db, `user/${patientId}/clinicAppointments/${appointmentKey}/doctors_prescription`);
+
+  onValue(prescriptionRef, (snapshot) => {
+    const data = snapshot.val();
+    if (data) {
+      const prescriptionsArray = Object.keys(data).map((key) => ({
+        prescriptionId: key,
+        ...data[key],
+      }));
+      setPrescriptions(prescriptionsArray);
+    } else {
+      setPrescriptions([]);
+    }
+  }, {
+  });
+};
+
+export const getallPrescriptions = (patientId, appointmentKey, setPrescriptions) => {
+  const db = getDatabase();
+  const prescriptionsRef = ref(db, `user/${patientId}/clinicAppointments/${appointmentKey}/doctors_prescription`);
+
+  const unsubscribe = onValue(prescriptionsRef, (snapshot) => {
+    const data = snapshot.val();
+    if (data) {
+      const prescriptionList = Object.entries(data).map(([key, value]) => ({
+        prescriptionId: key,
+        ...value,
+      }));
+      setPrescriptions(prescriptionList);
+    } else {
+      setPrescriptions([]);
+    }
+  });
+
+  return unsubscribe;
+};
+
+export const deletePrescription = async (patientId, appointmentKey, prescriptionId) => {
+  const db = getDatabase();
+  const prescriptionRef = ref(db, `user/${patientId}/clinicAppointments/${appointmentKey}/doctors_prescription/${prescriptionId}`);
+
+  try {
+    await remove(prescriptionRef);
+    return { success: true };
+  } catch (error) {
+    console.error("Error deleting prescription:", error);
+    return { success: false, error };
+  }
+};
+
+export const fetchPrescriptions = (patientId, appointmentKey, setPrescriptions) => {
+  const db = getDatabase();
+  const prescriptionsRef = ref(db, `user/${patientId}/clinicAppointments/${appointmentKey}/doctors_prescription`);
+
+  const unsubscribe = onValue(prescriptionsRef, (snapshot) => {
+    const data = snapshot.val();
+    if (data) {
+      const prescriptionList = Object.entries(data).map(([key, value]) => ({
+        prescriptionId: key,
+        ...value,
+      }));
+      setPrescriptions(prescriptionList);
+    } else {
+      setPrescriptions([]);
+    }
+  });
+
+  return unsubscribe;
+};
+
+export const savePrescription = async (patientId, appointmentKey, prescriptionId, updatedData) => {
+  const db = getDatabase();
+  const prescriptionRef = ref(db, `user/${patientId}/clinicAppointments/${appointmentKey}/doctors_prescription/${prescriptionId}`);
+
+  try {
+    await update(prescriptionRef, updatedData);
+  } catch (error) {
+    console.error('Error updating prescription:', error);
+    throw error;
+  }
 };
