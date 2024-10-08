@@ -1,6 +1,6 @@
 import React, { useState, useRef, useContext } from "react";
-import { FlatList, StyleSheet, View, Animated } from "react-native";
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { FlatList, StyleSheet, View, Animated, Text } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import OnboardingItem from "./OnboardingItem";
 import Paginator from "./Paginator";
 import NextButton from "./NextButton";
@@ -34,6 +34,12 @@ const Onboarding = () => {
 
   return (
     <View style={styles.container}>
+      {/* CareConnect header in the top-left corner */}
+      <View style={styles.headerContainer}>
+        <Text style={styles.header}>CareConnect</Text>
+      </View>
+
+      {/* FlatList to display onboarding items */}
       <View style={{ flex: 3 }}>
         <FlatList
           data={sides}
@@ -53,7 +59,11 @@ const Onboarding = () => {
           ref={slidesRef}
         />
       </View>
+
+      {/* Paginator for navigation between items */}
       <Paginator data={sides} scrollx={scrollx} />
+
+      {/* Button to navigate to next item */}
       <NextButton
         scrollTo={scrollTo}
         percentage={(currentIndex + 1) * (100 / sides.length)}
@@ -67,7 +77,18 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: 'white'
+    backgroundColor: "white",
+  },
+  headerContainer: {
+    position: "absolute", 
+    top: 15,
+    left: 15, 
+    zIndex: 10, 
+  },
+  header: {
+    fontSize: 20,
+    fontWeight: "900",
+    color: "#00BFA5",
   },
 });
 

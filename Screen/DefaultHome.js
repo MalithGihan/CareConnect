@@ -81,7 +81,7 @@ export default function DefaultHome() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor:'#D9E4EC'
+    backgroundColor:'white'
   },
   leftCorner: {
     position: 'absolute',
@@ -105,7 +105,7 @@ const styles = StyleSheet.create({
     left: 10,
     position: 'absolute',
     justifyContent: 'flex-end',
-    alignItems: 'baseline',
+    alignItems: 'baseline'
   },
   text: {
     fontSize: 40,

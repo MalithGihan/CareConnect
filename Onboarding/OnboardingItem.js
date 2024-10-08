@@ -20,24 +20,25 @@ const styles = StyleSheet.create({
         flex : 1,
         justifyContent : 'center',
         alignItems : 'center',
-        backgroundColor:'white'
+        backgroundColor:'white',
+        paddingHorizontal:15
     },
-
     image : {
         flex : 0.7,
         justifyContent: 'center',
         width:'80%',
     },
     title: {
-        fontWeight :'800',
-        fontSize: 28,
+        fontWeight :'900',
+        fontSize: 27,
         marginBottom: 20,
         color : '#003366',
         textAlign: 'center'
     },
     description : {
-        fontWeight : '300',
+        fontWeight : '100',
         color : '#000',
+        fontSize:12,
         textAlign : 'center',
         paddingHorizontal : 64,
     }

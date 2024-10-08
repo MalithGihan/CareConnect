@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { LinearGradient } from "expo-linear-gradient";
 
 const { width } = Dimensions.get("window");
 
@@ -31,7 +32,7 @@ const emergencyNumbers = [
 const emergencyTips = [
   {
     topic: "CPR",
-    image: "https://example.com/cpr-image-1.png",
+    image: "../assets/images/undraw_Healthy_lifestyle_re_ifwg.png",
     steps: [
       "Check Responsiveness: Tap the person and shout, 'Are you okay?'",
       "Call for Help: If there's no response, call emergency services or ask someone else to do so.",
@@ -69,7 +70,6 @@ const EmergencyPage = () => {
     setCurrentPage(pageIndex);
   };
 
-  // Filtered data based on search query
   const filteredNumbers = emergencyNumbers.filter((item) =>
     item.place.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -103,6 +103,7 @@ const EmergencyPage = () => {
       <TextInput
         style={styles.searchBar}
         placeholder={activeTab === "contacts" ? "Search place" : "Search topic"}
+        placeholderTextColor="#32"
         value={searchQuery}
         onChangeText={setSearchQuery}
       />
@@ -145,14 +146,31 @@ const EmergencyPage = () => {
           >
             {filteredTips.map((tip, index) => (
               <View key={index} style={styles.slide}>
-                <ScrollView contentContainerStyle={styles.stepsScroll}>
-                  <Text style={styles.topicText}>{tip.topic}</Text>
-                  <Image source={{ uri: tip.image }} style={styles.image} />
-                  {tip.steps.map((step, stepIndex) => (
-                    <Text key={stepIndex} style={styles.step}>
-                      {step}
-                    </Text>
-                  ))}
+                <ScrollView contentContainerStyle={{ paddingBottom: 180 }}>
+                  <LinearGradient
+                    colors={["rgba(0, 51, 102, 0.4)", "rgba(0, 191, 165, 0.4)"]}
+                    style={styles.stepsScroll}
+                  >
+                    <Text style={styles.topicText}>{tip.topic}</Text>
+                    <Image source={{ uri: tip.image }} style={styles.image} />
+                    {tip.steps.map((step, stepIndex) => (
+                      <View
+                        key={stepIndex} // Add a unique key for each step
+                        style={{
+                          backgroundColor: "white",
+                          padding: 10,
+                          borderRadius: 8,
+                          marginBottom: 10,
+                          shadowColor: "#000",
+                          shadowOffset: { width: 0, height: 8 },
+                          shadowOpacity: 0.5,
+                          shadowRadius: 5,
+                        }}
+                      >
+                        <Text style={styles.step}>{step}</Text>
+                      </View>
+                    ))}
+                  </LinearGradient>
                 </ScrollView>
               </View>
             ))}
@@ -173,46 +191,66 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   tabButton: {
-    height: 60,
-    width: 60,
+    height: 50,
+    width: 50,
     borderRadius: 30,
     backgroundColor: "#D9D9D9",
     justifyContent: "center",
     alignItems: "center",
     margin: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 5,
   },
   activeTab: {
     backgroundColor: "#003366",
   },
   searchBar: {
     marginHorizontal: 20,
-    marginVertical:10,
+    marginVertical: 10,
     padding: 10,
-    backgroundColor: "white",
+    backgroundColor: "#D9E4EC",
+    borderRadius: 10,
+    placeholder: "white",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 5,
     borderRadius: 10,
   },
   phoneNumberList: {
     paddingHorizontal: 20,
-    paddingBottom:100
+    paddingBottom: 100,
   },
   numberContainer: {
     marginVertical: 2,
-    padding: 15,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    marginVertical: 10,
     backgroundColor: "#f1f1f1",
     borderRadius: 8,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 5,
   },
   placeText: {
     fontSize: 16,
     fontWeight: "bold",
+    color: "#003366",
   },
   callButton: {
     height: 40,
     width: 40,
     borderRadius: 30,
-    backgroundColor: "#D9D9D9",
+    backgroundColor: "#003366",
     justifyContent: "center",
     alignItems: "center",
     margin: 10,
@@ -235,129 +273,33 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: 20,
-    paddingBottom:100
+    paddingBottom: 100,
   },
   topicText: {
-    fontSize: 28,
-    fontWeight: "bold",
+    fontSize: 25,
+    fontWeight: "900",
     marginBottom: 20,
+    color: "#003366",
   },
   image: {
-    width: "100%",
-    height: 200,
+    width: "50%",
+    height: 100,
     marginBottom: 20,
     resizeMode: "contain",
   },
   stepsScroll: {
     minHeight: "100%",
-    backgroundColor: "#f1f1f1",
+    backgroundColor: "rgba(241, 241, 241, 0.3)",
     padding: 20,
     borderRadius: 10,
   },
   step: {
-    fontSize: 16,
+    fontSize: 12,
+    fontWeight: "600",
     marginVertical: 5,
-    lineHeight: 24,
+    lineHeight: 18,
+    color: "#003366",
   },
 });
 
 export default EmergencyPage;
-
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//   },
-//   tabContainer: {
-//     flexDirection: "row",
-//     justifyContent: "space-around",
-//     paddingVertical: 10,
-//   },
-//   tabButton: {
-//     height: 60,
-//     width: 60,
-//     borderRadius: 30,
-//     backgroundColor: "#D9D9D9",
-//     justifyContent: "center",
-//     alignItems: "center",
-//     margin: 10,
-//   },
-//   activeTab: {
-//     backgroundColor: "#003366",
-//   },
-//   tabText: {
-//     color: "#000",
-//     fontWeight: "bold",
-//   },
-//   phoneNumberList: {
-//     padding: 20,
-//   },
-//   numberContainer: {
-//     marginVertical: 2,
-//     padding: 15,
-//     backgroundColor: "#f1f1f1",
-//     borderRadius: 8,
-//     flexDirection: "row",
-//     justifyContent: "space-between",
-//     alignItems: "center",
-//   },
-//   placeText: {
-//     fontSize: 16,
-//     fontWeight: "bold",
-//   },
-//   callButton: {
-//     height: 40,
-//     width: 40,
-//     borderRadius: 30,
-//     backgroundColor: "#D9D9D9",
-//     justifyContent: "center",
-//     alignItems: "center",
-//     margin: 10,
-//   },
-//   callButtonText: {
-//     color: "#fff",
-//     fontSize: 14,
-//   },
-//   dotContainer: {
-//     flexDirection: "row",
-//     justifyContent: "center",
-//     alignItems: "center",
-//     marginVertical: 10,
-//   },
-//   dot: {
-//     height: 10,
-//     width: 10,
-//     borderRadius: 5,
-//     backgroundColor: "#ccc",
-//     marginHorizontal: 5,
-//   },
-//   slide: {
-//     width: width,
-//     justifyContent: "center",
-//     alignItems: "center",
-//     paddingHorizontal: 20,
-//   },
-//   topicText: {
-//     fontSize: 28,
-//     fontWeight: "bold",
-//     marginBottom: 20,
-//   },
-//   image: {
-//     width: "100%",
-//     height: 200,
-//     marginBottom: 20,
-//     resizeMode: "contain",
-//   },
-//   stepsScroll: {
-//     minHeight: "100%",
-//     backgroundColor: "#f1f1f1",
-//     padding: 20,
-//     borderRadius: 10,
-//   },
-//   step: {
-//     fontSize: 16,
-//     marginVertical: 5,
-//     lineHeight: 24,
-//   },
-// });
-
-// export default EmergencyPage;

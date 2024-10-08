@@ -9,7 +9,7 @@ export default CustomButton = (props) => {
           isLoading && isLoading == true? (
             <ActivityIndicator size="small" color='black' />
           ) : (
-            <Text style={{fontSize: 15,color:'black',fontWeight:'bold'}}>
+            <Text style={{fontSize: 20,color:'white',fontWeight:'bold'}}>
               {props.title}
             </Text>
           )
@@ -21,13 +21,16 @@ export default CustomButton = (props) => {
 
 const styles = StyleSheet.create({
    btn : {
-    paddingHorizontal: 50,
+    paddingHorizontal: 5,
     paddingVertical: 10,
-    borderColor: 'black',
-    borderWidth: 2,
-    borderRadius: 10,
+    borderRadius: 50,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 15,
+    marginTop: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 5,
    }
 })

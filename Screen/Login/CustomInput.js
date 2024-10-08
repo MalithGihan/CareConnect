@@ -12,9 +12,8 @@ const CustomInput = (props) => {
         <TextInput 
           {...props}
           placeholder={props.placeholder}
-          placeholderTextColor={props.placeholderTextColor}
           style={styles.input}
-          value={props.value} // Controlled by parent
+          value={props.value} 
           onChangeText={onChangeText}
         />
       </View>
@@ -33,18 +32,12 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     width: '100%',
-    paddingHorizontal: 10,
-    paddingVertical: 10,
-    borderRadius: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: 'gray',
-    marginVertical: 16,
+    paddingTop:5,
     flexDirection: 'row',
   },
   input: {
     color: 'gray',
     flex: 1,
-    paddingTop: 0,
     fontSize: 15,
   },
   errorContainer: {
