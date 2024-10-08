@@ -1,5 +1,5 @@
-import { StyleSheet, Text, Dimensions, Image, View, Alert, ScrollView } from "react-native";
-import React, { useState } from "react";
+import { StyleSheet, Text, Dimensions, View, Alert } from "react-native";
+import React, { useState, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import CommonNavBtn from "../Components/CommonNavBtn";
@@ -10,6 +10,20 @@ import { color } from "react-native-elements/dist/helpers";
 export default function DefaultHome() {
   const [currentPage, setCurrentPage] = useState(0);
   const navigation = useNavigation();
+
+  const { width } = Dimensions.get("window");
+  const isPhone = width < 768;
+
+  useEffect(() => {
+    const delayRedirect = setTimeout(() => {
+      if (isPhone) {
+        navigation.navigate("Sign In");
+      } else {
+        navigation.navigate("Signin Admin");
+      }
+    }, 2000); 
+    return () => clearTimeout(delayRedirect);
+  }, [isPhone, navigation]);
 
   const clearOnboarding = async () => {
     try {
@@ -23,6 +37,13 @@ export default function DefaultHome() {
     }
   };
 
+  const handleSignInPress = () => {
+    if (isPhone) {
+      navigation.navigate("Sign In");
+    } else {
+      navigation.navigate("Signin Admin");
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -34,22 +55,24 @@ export default function DefaultHome() {
         </View>
 
         <View style={styles.rightCorner}>
-          <CommonNavBtn 
-            onPress={() => navigation.navigate("Sign In")}
+          <CommonNavBtn
+            onPress={handleSignInPress}
             title='Sign In'
             style={{ marginVertical: 8,backgroundColor:'#003366'}}
           />
         </View>
       </View>
 
-      <EmergencyPage />
+      {isPhone && <EmergencyPage />}
 
 
       <View style={styles.centeredButton}>
-        <CommonNavBtn 
+        <CommonNavBtn
           title='Clear Onboarding'
           onPress={clearOnboarding}
           style={{ marginHorizontal: 5 , backgroundColor:'#003366'}}
+
+
         />
       </View>
     </View>

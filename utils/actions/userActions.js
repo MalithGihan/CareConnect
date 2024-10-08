@@ -1,5 +1,6 @@
-import { child, get, getDatabase, ref, update, push, set, remove, addDoc } from "firebase/database";
+import { child, get, getDatabase, ref, update, push, set, remove, onValue } from "firebase/database";
 import { getFirebaseApp } from "../firebaseHelper";
+import { getAuth } from 'firebase/auth';
 
 export const getUserData = async (userId) => {
   try {
@@ -48,28 +49,43 @@ export const getAllPatients = async () => {
   }
 };
 
-export const AddClinicDate = async (userId, newClinicDate, doctor, venue, time) => {
+export const AddClinicDate = async (userId, newClinicDate, doctorId, doctorName, venue, time) => {
   try {
     const app = getFirebaseApp();
     const dbRef = ref(getDatabase(app));
-    const userRef = child(dbRef, `user/${userId}`);
 
-    const snapshot = await get(userRef);
-    const userData = snapshot.val();
+    const userRef = child(dbRef, `user/${userId}`);
+    const userSnapshot = await get(userRef);
+    const userData = userSnapshot.val();
 
     const newClinicAppointment = {
       date: newClinicDate,
-      doctor: doctor,
+      doctor: doctorName,
       venue: venue,
       time: time
     };
 
-    const updatedAppointments = userData.clinicAppointments
+    const updatedAppointments = userData?.clinicAppointments
       ? [...userData.clinicAppointments, newClinicAppointment]
       : [newClinicAppointment];
 
     await update(userRef, { clinicAppointments: updatedAppointments });
     console.log(`Clinic appointment updated for user ${userId}`);
+
+    const doctorRef = child(dbRef, `user/${doctorId}/clinicDates`);
+
+    const newDoctorAppointment = {
+      patientId: userId,
+      venue: venue,
+      date: newClinicDate,
+      time: time,
+      status: false
+    };
+
+    await push(doctorRef, newDoctorAppointment);
+
+    console.log(`Clinic appointment added under doctor ${doctorId} for date ${newClinicDate}`);
+
   } catch (err) {
     console.error("Error updating clinic appointment:", err);
     throw err;
@@ -416,4 +432,359 @@ export const recordCancellation = async (selectedDate, cancellationReason) => {
     console.error('Error saving cancellation record:', error);
     throw error;
   }
+};
+
+export const addNewsItem = async (title, description, date, imageUrl = null) => {
+  try {
+    const app = getFirebaseApp();
+    const dbRef = ref(getDatabase(app));
+    const newsFeedRef = child(dbRef, 'newsFeed');
+
+    const newNewsItem = {
+      title,
+      description,
+      date: date,
+      imageUrl,
+      createdAt: Date.now()
+    };
+
+    const newNewsRef = push(newsFeedRef);
+    await set(newNewsRef, newNewsItem);
+
+    console.log("News feed item successfully added:", newNewsItem);
+    return newNewsItem;
+  } catch (err) {
+    console.error("Error adding news feed item:", err.message);
+    throw new Error("Failed to add news feed item.");
+  }
+};
+
+
+export const fetchNewsFeed = async () => {
+  try {
+    const app = getFirebaseApp();
+    const dbRef = ref(getDatabase(app));
+    const newsFeedRef = child(dbRef, 'newsFeed');
+
+    const snapshot = await get(newsFeedRef);
+
+    if (snapshot.exists()) {
+      const newsFeedData = snapshot.val();
+      const newsItems = Object.keys(newsFeedData).map(newsId => ({
+        id: newsId,
+        ...newsFeedData[newsId]
+      }));
+
+      console.log("News feed items fetched:", newsItems);
+      return newsItems;
+    } else {
+      console.log("No news feed items found.");
+      return [];
+    }
+  } catch (err) {
+    console.error("Error fetching news feed items:", err);
+    throw err;
+  }
+};
+
+export const deleteNewsFeedItem = async (newsId) => {
+  try {
+    const app = getFirebaseApp();
+    const dbRef = ref(getDatabase(app));
+    const newsItemRef = child(dbRef, `newsFeed/${newsId}`);
+
+    await remove(newsItemRef);
+    console.log(`News feed item ${newsId} deleted.`);
+  } catch (err) {
+    console.error("Error deleting news feed item:", err);
+    throw err;
+  }
+};
+
+export const updateNewsFeedItem = async (newsId, updatedFields) => {
+  try {
+    const app = getFirebaseApp();
+    const dbRef = ref(getDatabase(app));
+    const newsItemRef = child(dbRef, `newsFeed/${newsId}`);
+
+    await update(newsItemRef, updatedFields);
+    console.log(`News feed item ${newsId} updated with fields:`, updatedFields);
+  } catch (err) {
+    console.error("Error updating news feed item:", err);
+    throw err;
+  }
+};
+
+// Doctor
+export const fetchClinicDates = async (doctorId) => {
+  try {
+    const app = getFirebaseApp();
+    const dbRef = ref(getDatabase(app));
+    const doctorRef = child(dbRef, `user/${doctorId}/clinicDates`);
+
+    const snapshot = await get(doctorRef);
+
+    const dates = snapshot.val() || {};
+    const formattedDates = {};
+
+    Object.keys(dates).forEach(key => {
+      const date = dates[key].date;
+      formattedDates[date] = { marked: true };
+    });
+
+    return formattedDates;
+  } catch (error) {
+    console.error('Error fetching clinic dates:', error);
+    return {};
+  }
+};
+
+export const fetchAppointmentsForToday = async (setAppointments) => {
+  const auth = getAuth();
+  const currentUser = auth.currentUser;
+  const userId = currentUser ? currentUser.uid : null;
+
+  if (!userId) {
+    console.log("User ID is not available");
+    return;
+  }
+
+  try {
+    const db = getDatabase();
+    const today = new Date().toISOString().split('T')[0];
+    // const yesterday = new Date();
+    // const tomorrow = new Date(yesterday);
+    // tomorrow.setDate(yesterday.getDate() + 1);
+    // const today = tomorrow.toISOString().split('T')[0];
+
+    const dateRef = ref(db, `user/${userId}/clinicDates/`);
+    const snapshot = await get(dateRef);
+
+    if (snapshot.exists()) {
+      const data = snapshot.val();
+      const todayAppointments = Object.entries(data).filter(([key, d]) => d.date === today);
+
+      if (todayAppointments.length > 0) {
+        const appointmentPromises = todayAppointments.map(async ([key, appointment]) => {
+          const patientName = await fetchPatientName(appointment.patientId);
+          return {
+            id: appointment.patientId,
+            name: patientName,
+            time: appointment.time,
+            venue: appointment.venue,
+            date: appointment.date,
+            status: appointment.status || false,
+            key: key,
+          };
+        });
+        const resolvedAppointments = await Promise.all(appointmentPromises);
+        setAppointments(resolvedAppointments);
+      } else {
+        setAppointments([]);
+      }
+    } else {
+      console.log("No clinic dates found for today");
+      setAppointments([]);
+    }
+  } catch (error) {
+    console.error('Error fetching today\'s appointments:', error);
+    setAppointments([]);
+  }
+};
+
+export const fetchPatientName = async (patientId) => {
+  const db = getDatabase();
+  const patientRef = ref(db, `user/${patientId}`);
+  const snapshot = await get(patientRef);
+
+  if (snapshot.exists()) {
+    const patientData = snapshot.val();
+    return patientData.fullName || 'Name not available';
+  }
+  return 'Name not available';
+};
+
+export const updateStatus = async (userId, appointment, setAppointments) => {
+  try {
+    const db = getDatabase();
+    const appointmentRef = ref(db, `user/${userId}/clinicDates/${appointment.key}`);
+    await update(appointmentRef, { status: true });
+    alert("Status updated to true!");
+
+    setAppointments((appointments) =>
+      appointments.map(app =>
+        app.key === appointment.key ? { ...app, status: true } : app
+      )
+    );
+  } catch (error) {
+    console.error('Error updating status:', error);
+  }
+};
+
+export const fetchPatientAppointments = async (patientId, date, setAppointmentKey, setPrescriptions) => {
+  try {
+    const db = getDatabase();
+    const appointmentRef = ref(db, `user/${patientId}/clinicAppointments/`);
+    const snapshot = await get(appointmentRef);
+
+    if (snapshot.exists()) {
+      const appointments = snapshot.val();
+      const matchingAppointment = Object.entries(appointments).find(([key, appointment]) =>
+        appointment.date === date
+      );
+
+      if (matchingAppointment) {
+        const [key, appointment] = matchingAppointment;
+        setAppointmentKey(key);
+        setPrescriptions(appointment.prescriptions || []);
+        return key;
+      } else {
+        console.log('No matching appointment found for the selected date');
+      }
+    } else {
+      console.log('No appointments found for the patient');
+    }
+  } catch (error) {
+    console.error('Error fetching patient appointments:', error);
+  }
+};
+
+export const handleAddNote = async (patientId, appointmentKey, note, diagnosis, medications, setPrescriptions) => {
+  if (!appointmentKey) {
+    console.error('Appointment key is not available, cannot save note');
+    return;
+  }
+
+  if (note.trim() === '' || diagnosis.trim() === '' || medications.trim() === '') {
+    alert('All fields are required');
+    return;
+  }
+
+  try {
+    const db = getDatabase();
+    const prescriptionsRef = ref(db, `user/${patientId}/clinicAppointments/${appointmentKey}/doctors_prescription`);
+    const newNoteRef = push(prescriptionsRef);
+
+    const newPrescription = {
+      note: note,
+      diagnosis: diagnosis,
+      medications: medications,
+      createdAt: new Date().toISOString(),
+    };
+
+    await update(newNoteRef, newPrescription);
+    setPrescriptions((prevPrescriptions) => [...prevPrescriptions, newPrescription]);
+    alert('Prescription added successfully');
+  } catch (error) {
+    console.error('Error adding prescription:', error);
+    alert('Error adding prescription');
+  }
+};
+
+export const fetchDoctorPrescription = async (patientId, appointmentKey, setPrescriptions) => {
+  try {
+    const db = getDatabase();
+    const prescriptionRef = ref(db, `user/${patientId}/clinicAppointments/${appointmentKey}/doctors_prescription`);
+    const snapshot = await get(prescriptionRef);
+
+    if (snapshot.exists()) {
+      const prescriptionData = snapshot.val();
+      setPrescriptions((prevPrescriptions) => [
+        ...prevPrescriptions,
+        ...Object.values(prescriptionData),
+      ]);
+    } else {
+      console.log('No prescription found for this appointment');
+    }
+  } catch (error) {
+    console.error('Error fetching doctor\'s prescription:', error);
+  }
+};
+
+export const fetchClinicDatestoDoc = async (userId) => {
+  const db = getDatabase();
+  const doctorRef = ref(db, `user/${userId}/clinicDates/`);
+  const snapshot = await get(doctorRef);
+  const dates = {};
+  if (snapshot.exists()) {
+    const data = snapshot.val();
+    Object.keys(data).forEach(key => {
+      const date = data[key].date;
+      if (date) {
+        dates[date] = { marked: true, dotColor: 'blue' };
+      }
+    });
+  } else {
+    console.log("No clinic dates found");
+  }
+  return dates;
+};
+
+export const fetchPatientNamebyid = async (patientId) => {
+  try {
+    const db = getDatabase();
+    const patientRef = ref(db, `user/${patientId}`);
+    const snapshot = await get(patientRef);
+    if (snapshot.exists()) {
+      const patientData = snapshot.val();
+      return patientData.fullName || 'Name not available';
+    }
+    return 'Name not available';
+  } catch (error) {
+    console.error('Error fetching patient name:', error);
+    return 'Error fetching name';
+  }
+};
+
+export const handleDatePress = async (userId, day, setAppointments) => {
+  try {
+    const db = getDatabase();
+    const dateRef = ref(db, `user/${userId}/clinicDates/`);
+    const snapshot = await get(dateRef);
+    if (snapshot.exists()) {
+      const data = snapshot.val();
+      const selectedDateAppointments = Object.values(data).filter(d => d.date === day.dateString);
+
+      if (selectedDateAppointments.length > 0) {
+        const appointmentPromises = selectedDateAppointments.map(async (appointment) => {
+          const patientName = await fetchPatientNamebyid(appointment.patientId);
+          return {
+            id: appointment.patientId,
+            name: patientName,
+            time: appointment.time,
+            venue: appointment.venue,
+          };
+        });
+        const resolvedAppointments = await Promise.all(appointmentPromises);
+        setAppointments(resolvedAppointments);
+      } else {
+        setAppointments([]);
+      }
+    }
+  } catch (error) {
+    console.error('Error fetching appointments:', error);
+    setAppointments([]);
+  }
+};
+
+export const fetchAppointments = (setAppointments) => {
+  const auth = getAuth();
+  const userId = auth.currentUser?.uid;
+  if (!userId) return;
+
+  const db = getDatabase();
+  const appointmentsRef = ref(db, `user/${userId}/clinicAppointments/`);
+
+  onValue(appointmentsRef, (snapshot) => {
+    if (snapshot.exists()) {
+      const data = snapshot.val();
+      const appointmentsArray = Object.entries(data).map(([key, value]) => ({
+        id: key,
+        ...value
+      }));
+      setAppointments(appointmentsArray);
+    } else {
+      console.log(`No appointments found for user ${userId}`);
+    }
+  });
 };

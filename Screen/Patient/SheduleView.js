@@ -5,6 +5,7 @@ import { useSelector } from 'react-redux';
 import { getUserClinicAppointments, getUserNotes, getUserNotifications } from '../../utils/actions/userActions';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 
 export default function ScheduleView() {
   const [markedDates, setMarkedDates] = useState({});
@@ -136,30 +137,42 @@ export default function ScheduleView() {
         onDayPress={handleDayPress}
       />
       {selectedDate && (
-        <View style={styles.detailsSection}>
-          <Text style={styles.sectionTitle}>Appointments for {selectedDate}</Text>
-          <FlatList
-            data={appointments.filter(apt => apt.date === selectedDate)}
-            renderItem={renderAppointment}
-            keyExtractor={(item) => item.id}
-            ListEmptyComponent={<Text>No appointments for this date.</Text>}
-          />
-          <Text style={styles.sectionTitle}>Notes</Text>
-          <FlatList
-            data={notes[selectedDate] ? Object.values(notes[selectedDate]) : []}
-            renderItem={renderNote}
-            keyExtractor={(item) => item.timestamp.toString()}
-            ListEmptyComponent={<Text>No notes for this date.</Text>}
-          />
+        <View style={styles.Section}>
+          <LinearGradient
+            colors={['rgba(0, 51, 102, 0.2)', 'rgba(0, 191, 165, 0.2)']} style={styles.detailsSection}>
+            <View style={styles.upSection}>
+              <Text style={styles.sectionTitle}>Appointments for {selectedDate}</Text>
+              <FlatList
+                data={appointments.filter(apt => apt.date === selectedDate)}
+                renderItem={renderAppointment}
+                keyExtractor={(item) => item.id}
+                ListEmptyComponent={<Text>No appointments for this date.</Text>}
+              />
+            </View>
+          </LinearGradient>
+          <LinearGradient
+            colors={['rgba(0, 51, 102, 0.2)', 'rgba(0, 191, 165, 0.2)']} style={styles.detailsSection}>
+            <Text style={{ ...styles.sectionTitle, fontSize: 20, marginLeft: 20, color: 'white' }}>Notes</Text>
+            <View style={styles.bottomSection}>
+
+              <FlatList style={styles.bottomitem}
+                data={notes[selectedDate] ? Object.values(notes[selectedDate]) : []}
+                renderItem={renderNote}
+                keyExtractor={(item) => item.timestamp.toString()}
+                ListEmptyComponent={<Text>No notes for this date.</Text>}
+              />
+            </View>
+          </LinearGradient>
         </View>
       )}
       {isClinicDate && (
-        <TouchableOpacity
+       <LinearGradient
+       colors={['rgba(0, 51, 102, 0.2)', 'rgba(0, 191, 165, 0.2)']}
           style={styles.floatingButton}
           onPress={handleAddNotePress}
         >
           <Ionicons name="add" size={30} color="white" />
-        </TouchableOpacity>
+        </LinearGradient>
       )}
     </View>
   );
@@ -175,7 +188,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: 10,
-    backgroundColor: 'white',
+    backgroundColor: '#D9E4EC',
   },
   headerTitle: {
     fontSize: 20,
@@ -183,14 +196,16 @@ const styles = StyleSheet.create({
     color: '#003366',
   },
   detailsSection: {
-    padding: 20,
-    flex: 1,
+    borderRadius: 20,
+    margin: 10,
+    flex: 1
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    marginTop: 10,
-    marginBottom: 10,
+    marginTop: 5,
+    marginBottom: 5,
+    marginLeft:20
   },
   appointmentItem: {
     padding: 10,
@@ -200,13 +215,15 @@ const styles = StyleSheet.create({
   },
   appointmentText: {
     fontSize: 16,
-    marginBottom: 5,
   },
   noteItem: {
+    marginVertical: 10,
     padding: 10,
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
     width: '100%',
+    backgroundColor: 'white',
+    borderRadius: 15
   },
   timestamp: {
     fontSize: 12,
@@ -220,7 +237,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     right: 30,
     bottom: 30,
-    backgroundColor: '#007AFF',
+    backgroundColor: 'rgba(0,122,255,0.5)',
     borderRadius: 30,
     elevation: 8,
     shadowColor: '#000',
@@ -252,18 +269,33 @@ const styles = StyleSheet.create({
   },
   calendarStyle: {
     alignSelf: 'center',
-    width: 380,
-    height: 350,
     borderWidth: 1,
     borderColor: 'black',
     borderRadius: 10,
     backgroundColor: 'white',
-    padding: 10,
-    margin: 20,
+    width: '90%',
     elevation: 8,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.8,
     shadowRadius: 5,
   },
+  upSection: {
+    backgroundColor: 'white',
+    margin: 10,
+    
+    marginHorizontal: 15,
+    flex: 1,
+    borderRadius: 15,
+  },
+  bottomSection: {
+    marginHorizontal: 15,
+    flex: 1,
+    paddingBottom:10
+  },
+
+  Section: {
+    flex: 1,
+    marginHorizontal:10
+  }
 });

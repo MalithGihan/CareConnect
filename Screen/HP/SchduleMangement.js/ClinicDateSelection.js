@@ -110,7 +110,7 @@ export default function ClinicDateSelection() {
                 setLoading(true);
                 const promises = selectedPatientIds.map((id, index) => {
                     const appointmentTime = index === 0 ? time : patientTimes[index];
-                    return AddClinicDate(id, selectedDate, doctor, venue, appointmentTime);
+                    return AddClinicDate(id, selectedDate, doctor.id, doctor.name, venue, appointmentTime);
                 });
                 await Promise.all(promises);
                 await blockTimeSlot(selectedDate, time);
@@ -124,7 +124,7 @@ export default function ClinicDateSelection() {
                         date: `${selectedDate}`,
                         Time: `${appointmentTime}`,
                         venue: `${venue}`,
-                        doctor: `Dr. ${doctor}`,
+                        doctor: `Dr. ${doctor.fullName}`,
                         dateC: new Date().toISOString(),
                         read: false,
                     };
@@ -190,14 +190,15 @@ export default function ClinicDateSelection() {
                 <Text>Select Doctor:</Text>
                 <Picker
                     selectedValue={doctor}
-                    onValueChange={setDoctor}
+                    onValueChange={(itemValue) => setDoctor(itemValue)}
                     style={styles.input}
                 >
                     <Picker.Item label="Select a doctor" value="" />
                     {doctors.map((doc) => (
-                        <Picker.Item key={doc.id} label={doc.name} value={doc.name} />
+                        <Picker.Item key={doc.id} label={doc.name} value={doc} />
                     ))}
                 </Picker>
+
 
                 <TextInput
                     style={styles.input}
