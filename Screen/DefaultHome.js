@@ -72,7 +72,6 @@ export default function DefaultHome() {
           onPress={clearOnboarding}
           style={{ marginHorizontal: 5 , backgroundColor:'#003366'}}
 
-
         />
       </View>
     </View>
