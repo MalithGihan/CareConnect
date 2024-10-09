@@ -1,11 +1,21 @@
-import { Text, View, FlatList, StyleSheet, Pressable } from 'react-native';
-import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
-import { getUserNotifications, markNotificationAsRead } from '../../utils/actions/userActions';
-import Entypo from '@expo/vector-icons/Entypo';
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { useNavigation } from '@react-navigation/native';
-import { LinearGradient } from 'expo-linear-gradient';
+import {
+  Text,
+  View,
+  FlatList,
+  StyleSheet,
+  Pressable,
+  TouchableOpacity,
+} from "react-native";
+import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import {
+  getUserNotifications,
+  markNotificationAsRead,
+} from "../../utils/actions/userActions";
+import Entypo from "@expo/vector-icons/Entypo";
+import { useNavigation } from "@react-navigation/native";
+import { LinearGradient } from "expo-linear-gradient";
+import Ionicons from "@expo/vector-icons/Ionicons";
 
 export default function Notifications() {
   const userData = useSelector((state) => state.auth.userData);
@@ -32,7 +42,9 @@ export default function Notifications() {
       await markNotificationAsRead(userData.userId, notificationId);
       setNotifications((prevNotifications) =>
         prevNotifications.map((notification) =>
-          notification.id === notificationId ? { ...notification, read: true } : notification
+          notification.id === notificationId
+            ? { ...notification, read: true }
+            : notification
         )
       );
     } catch (error) {
@@ -45,17 +57,22 @@ export default function Notifications() {
       return (
         <View style={styles.notificationItem}>
           <View style={styles.top}>
-            <Entypo name="calendar" size={24} color="black" />
+            
             <Text style={styles.datetamp}>
-              {new Date(item.dateC).toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
+              {new Date(item.dateC).toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
               })}
             </Text>
-            <Pressable onPress={() => handleMarkAsRead(item.id)}
-              style={[ styles.readButton, item.read ? styles.readButtonRead : styles.readButtonUnread, ]}>
-              <Text>{item.read ? "Read" : "Mark as Read"}</Text>
+            <Pressable
+              onPress={() => handleMarkAsRead(item.id)}
+              style={[
+                styles.readButton,
+                item.read ? styles.readButtonRead : styles.readButtonUnread,
+              ]}
+            >
+              <Text style={{color:"white"}}>{item.read ? "Read" : "Mark as Read"}</Text>
             </Pressable>
           </View>
           <Text style={styles.title}>{item.title}</Text>
@@ -64,11 +81,11 @@ export default function Notifications() {
           <Text>Venue: {item.venue}</Text>
           <Text>Doctor: {item.doctor}</Text>
           <Text style={styles.timestamp}>
-            {new Date(item.dateC).toLocaleTimeString('en-US', {
-              hour: '2-digit',
-              minute: '2-digit',
-              second: '2-digit',
-              hour12: true, 
+            {new Date(item.dateC).toLocaleTimeString("en-US", {
+              hour: "2-digit",
+              minute: "2-digit",
+              second: "2-digit",
+              hour12: true,
             })}
           </Text>
         </View>
@@ -77,31 +94,36 @@ export default function Notifications() {
       return (
         <View style={styles.notificationItem}>
           <View style={styles.top}>
-            <Entypo name="calendar" size={24} color="black" />
+            
             <Text style={styles.datetamp}>
-              {new Date(item.date).toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
+              {new Date(item.date).toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
               })}
             </Text>
-            <Pressable onPress={() => handleMarkAsRead(item.id)}
-              style={[ styles.readButton, item.read ? styles.readButtonRead : styles.readButtonUnread, ]}>
-              <Text>{item.read ? "Read" : "Mark as Read"}</Text>
+            <Pressable
+              onPress={() => handleMarkAsRead(item.id)}
+              style={[
+                styles.readButton,
+                item.read ? styles.readButtonRead : styles.readButtonUnread,
+              ]}
+            >
+              <Text style={{color:"white"}}>{item.read ? "Read" : "Mark as Read"}</Text>
             </Pressable>
           </View>
           <Text style={styles.title}>
-            <Text style={styles.symbol}>  !!  </Text>
+            <Text style={styles.symbol}> !! </Text>
             Clinic Appointment Cancelled
-            <Text style={styles.symbol}>  !!  </Text>
+            <Text style={styles.symbol}> !! </Text>
           </Text>
           <Text>Cancelled Date: {item.clinicDate}</Text>
           <Text>Reason: {item.reason}</Text>
           <Text style={styles.timestamp}>
-            {new Date(item.date).toLocaleTimeString('en-US', {
-              hour: '2-digit',
-              minute: '2-digit',
-              second: '2-digit',
+            {new Date(item.date).toLocaleTimeString("en-US", {
+              hour: "2-digit",
+              minute: "2-digit",
+              second: "2-digit",
               hour12: true,
             })}
           </Text>
@@ -112,12 +134,34 @@ export default function Notifications() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <MaterialIcons onPress={() => navigation.goBack()} name="arrow-back-ios-new" size={24} color="#003366" />
-        <Text style={styles.headerTitle}>Notifications</Text>
+      <View
+        style={{
+          flexDirection: "row",
+          width: "100%",
+          alignItems: "center",
+          marginBottom: 10,
+        }}
+      >
+        <TouchableOpacity onPress={() => navigation.navigate("Dashbord")}>
+          <Ionicons name="arrow-back-circle" size={40} color="#003366" />
+        </TouchableOpacity>
+        <Text
+          style={{
+            fontSize: 20,
+            marginLeft: 15,
+            color: "#003366",
+            flex: 1,
+            fontWeight: "900",
+          }}
+          numberOfLines={1}
+        >
+          Schedule Management
+        </Text>
       </View>
       <LinearGradient
-            colors={['rgba(0, 51, 102, 0.2)', 'rgba(0, 191, 165, 0.2)']} style={styles.notificationcontainer} >
+        colors={["rgba(0, 51, 102, 0.2)", "rgba(0, 191, 165, 0.2)"]}
+        style={styles.notificationcontainer}
+      >
         <FlatList
           data={notifications}
           renderItem={renderNotification}
@@ -132,101 +176,83 @@ export default function Notifications() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#D9E4EC',
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    padding: 10,
-    backgroundColor: '#D9E4EC',
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginLeft: 20,
-    color: '#003366',
+    backgroundColor: "#D9E4EC",
+    padding: 15,
   },
   top: {
-    flexDirection: 'row',
-    justifyContent: 'flex-start',
-    alignItems: 'center'
+    flexDirection: "row",
+    justifyContent: 'space-between',
+    gap:9
   },
   notificationItem: {
-    backgroundColor: 'white',
+    backgroundColor: "white",
     margin: 15,
     padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
     marginBottom: 10,
-    borderRadius: 15,
-    borderColor: 'black',
+    borderRadius: 20,
     elevation: 8,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.8,
     shadowRadius: 5,
   },
   symbol: {
-    color: 'red',
-    fontWeight: 'bold',
+    color: "red",
+    fontWeight: "bold",
     fontSize: 20,
   },
   title: {
-    fontWeight: 'bold',
-    fontSize: 16,
-    marginVertical: 10,
+    fontWeight: "900",
+    fontSize: 18,
+    marginVertical: 15,
   },
   datetamp: {
-    marginLeft: 20,
     fontSize: 15,
-    fontWeight: 'bold',
-    color: 'black',
+    fontWeight: "bold",
+    color: "black",
   },
   timestamp: {
-    alignSelf: 'flex-end',
+    alignSelf: "flex-end",
     fontSize: 12,
-    color: '#888',
+    color: "#888",
     marginTop: 5,
-    marginLeft: 10
+    marginLeft: 10,
   },
   readButton: {
-
-    position: 'relative',
     top: 0,
     right: 0,
     marginLeft: 50,
     padding: 1,
     borderRadius: 5,
-    borderWidth: 1,
-    borderColor: 'black',
-    borderRadius: 10,
+    borderRadius: 20,
   },
   readButtonRead: {
-    position: 'relative',
+    position: "absolute",
     top: 0,
-    left: 30, 
-    backgroundColor: 'white',
+    righ: 10,
+    backgroundColor: "#003366",
+    color:'white',
     paddingHorizontal: 15,
   },
   readButtonUnread: {
-    position: 'relative',
+    position: "absoluteive",
     top: 0,
-    left: -10,
+    righ: 10,
     paddingHorizontal: 10,
-    backgroundColor: 'white',
+    backgroundColor: "#003366",
   },
   notificationcontainer: {
-    width: 380,
+    top:10,
+    bottom:15,
     paddingVertical: 10,
-    margin: 20,
-    height: '87%',
-    backgroundColor: 'white',
-    alignSelf: 'center',
-    borderRadius: 25,
-    borderColor: 'black',
+    paddingBottom:20,
+    height: "87%",
+    backgroundColor: "white",
+    alignSelf: "center",
+    borderRadius: 20,
+    borderColor: "black",
     elevation: 5,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.8,
     shadowRadius: 5,

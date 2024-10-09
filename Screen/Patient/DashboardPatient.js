@@ -1,11 +1,14 @@
 import { StyleSheet, Text, View, FlatList, Image, Alert, Dimensions, TouchableOpacity, Pressable, ScrollView } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { fetchNewsFeed, getUserNotifications } from "../../utils/actions/userActions";
-import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import { Ionicons } from '@expo/vector-icons';
 import { useSelector } from 'react-redux';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+
+
 
 export default function DashboardPatient() {
   const [newsFeedItems, setNewsFeedItems] = useState([]);
@@ -53,8 +56,10 @@ export default function DashboardPatient() {
   const renderFeaturedItem = ({ item }) => (
     <View style={styles.featuredItem}>
       {item.imageUrl && <Image source={{ uri: item.imageUrl }} style={styles.featuredImage} />}
+      <View style={{flexDirection:'col'}}>
       <Text style={styles.featuredTitle}>{item.title}</Text>
       <Text style={styles.featuredTitle1}>{item.description}</Text>
+      </View>
     </View>
   );
 
@@ -76,7 +81,7 @@ export default function DashboardPatient() {
           )}
         </Pressable>
       </View>
-      <ScrollView>
+      
         <View>
           {featuredItems.length > 0 ? (
             <>
@@ -106,30 +111,36 @@ export default function DashboardPatient() {
             <Text style={styles.noNewsText}>No news feeds available at the moment.</Text>
           )}
         </View>
+        <ScrollView style={{marginBottom:100}}>
         <View style={styles.gridhorizonatle}>
-          <Pressable style={[styles.mainbtn, { width: '30%' },]}>
-            <MaterialCommunityIcons name="face-man" size={24} color="#00BFA5" />
+          <Pressable style={[styles.mainbtn, { width: '35%' },]} onPress={() => navigation.navigate("User Profile")}>
+          <FontAwesome5 name="hospital-user" size={50} color="#00BFA5" />
             <Text style={styles.mainbtntext}>Profile</Text>
           </Pressable>
-          <Pressable style={[styles.mainbtn, { width: '50%' },]}>
-            <FontAwesome5 name="book-medical" size={24} color="#00BFA5" />
+          <Pressable style={[styles.mainbtn, { width: '50%' },]} onPress={() => navigation.navigate("QucickTreatment")}>
+          <FontAwesome6 name="briefcase-medical" size={50} color="#00BFA5" />
             <Text style={styles.mainbtntext}>Quick Treatment</Text>
           </Pressable>
         </View>
 
-        <Text style={styles.mainbtntext}>Quick Treatment</Text>
+        <Text style={[styles.mainbtntext,{marginLeft:15,marginVertical:15,fontSize:18}]}>Quick Treatment</Text>
+
         <View style={styles.gridvertical} >
-          <Pressable style={[styles.btn, { width: '50%' },]}>
-            <FontAwesome5 name="book-medical" size={24} color="#00BFA5" />
-            <Text style={styles.mainbtntext}>Quick Treatment</Text>
+          <Pressable style={[styles.btn]} onPress={() => navigation.navigate("Medical History")}> 
+          <FontAwesome5 name="notes-medical" size={30} color="#00BFA5" />
+            <Text style={styles.mainbtntext}>Medical History</Text>
           </Pressable>
-          <Pressable style={[styles.btn, { width: '50%' },]}>
-            <FontAwesome5 name="book-medical" size={24} color="#00BFA5" />
-            <Text style={styles.mainbtntext}>Quick Treatment</Text>
+          <Pressable style={[styles.btn]} onPress={() => navigation.navigate("Clinic Shedules")}>
+          <FontAwesome5 name="history" size={30} color="#00BFA5" />
+            <Text style={styles.mainbtntext}>Clinic Schedule</Text>
           </Pressable>
-          <Pressable style={[styles.btn, { width: '50%' },]}>
-            <FontAwesome5 name="book-medical" size={24} color="#00BFA5" />
-            <Text style={styles.mainbtntext}>Quick Treatment</Text>
+          <Pressable style={[styles.btn]} onPress={() => navigation.navigate("Reports")}>
+          <FontAwesome5 name="file-medical-alt" size={30} color="#00BFA5" />
+            <Text style={styles.mainbtntext}>Lab Reports</Text>
+          </Pressable>
+          <Pressable style={[styles.btn]} onPress={() => navigation.navigate("")}>
+          <MaterialCommunityIcons name="car-emergency" size={30} color="#00BFA5" />
+            <Text style={styles.mainbtntext}>Emeargancy Pickup</Text>
           </Pressable>
         </View>
       </ScrollView>
@@ -143,84 +154,57 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#D9E4EC',
+    paddingHorizontal:15
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 10,
-    backgroundColor: 'white',
+    paddingVertical: 15,
   },
   headerTitle: {
     fontSize: 20,
-    fontWeight: 'bold',
-    marginLeft: 20,
+    fontWeight: '900',
     color: '#003366',
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginVertical: 10,
   },
   featuredList: {
     alignSelf: 'center',
-    width: '95%',
-    padding: 20,
-    marginBottom: 20,
+    width: '100%',
+    paddingHorizontal: 5,
+    paddingVertical:10,
+    marginBottom: 5,
   },
   featuredItem: {
-    width: width * 1,
-    marginRight: 10,
-    borderRadius: 8,
+    width: width * 0.8,
+    height:200,
+    flexDirection:'col',
+    justifyContent: 'space-around',
+    marginHorizontal: 5,
+    marginVertical:10,
+    borderRadius: 10,
     overflow: 'hidden',
+    backgroundColor:'white',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 5,
   },
   featuredImage: {
     width: '100%',
-    height: 150,
     resizeMode: 'cover',
   },
   featuredTitle: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    color: 'white',
-    padding: 10,
-    fontSize: 16,
-    fontWeight: 'bold',
+    margin:10,
+    color: 'black',
+    fontSize: 18,
+    fontWeight: '900',
   },
   featuredTitle1: {
-    alignSelf: 'flex-end',
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    color: 'white',
-    padding: 10,
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  newsFeedItem: {
-    backgroundColor: '#FFF',
-    padding: 10,
-    borderRadius: 8,
-    marginVertical: 5,
-    borderColor: '#ddd',
-    borderWidth: 1,
-  },
-  newsFeedTitle: {
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
-  image: {
-    width: 100,
-    height: 100,
-    borderRadius: 10,
-    marginTop: 10,
-    marginBottom: 10,
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 10,
+    margin:10,
+    color: 'black',
+    fontSize: 14,
+    fontWeight: '600',
   },
   dotContainer: {
     flexDirection: 'row',
@@ -228,21 +212,21 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   dot: {
-    width: 10,
-    height: 10,
+    width: 8,
+    height: 8,
     borderRadius: 5,
-    margin: 5,
+    margin: 4,
   },
   activeDot: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#00BFA5',
   },
   inactiveDot: {
-    backgroundColor: '#C4C4C4',
+    backgroundColor: '#000000',
   },
   noNewsText: {
     textAlign: 'center',
-    fontSize: 16,
-    color: '#999',
+    fontSize: 13,
+    color: '#000',
     marginTop: 20,
   },
   gridhorizonatle: {
@@ -253,35 +237,43 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   mainbtn: {
-    marginTop: 10,
+    marginVertical: 10,
+    marginHorizontal:15,
     alignItems: 'center',
     padding: 20,
-    height: 150,
-    borderRadius: 20,
+    height: 200,
+    borderRadius: 15,
     justifyContent: 'space-evenly',
-    borderColor: 'black',
-    borderWidth: 1
+    backgroundColor:'white',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 5,
   },
   mainbtntext: {
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: 15,
+    fontWeight: '900',
     color: '#003366',
   },
   btn: {
-    margin: 15,
+    marginHorizontal: 15,
+    marginVertical:10,
     alignItems: 'center',
     paddingVertical: 20,
-    width: 380,
-    borderRadius: 20,
+    borderRadius: 15,
     justifyContent: 'space-evenly',
-    borderColor: 'black',
-    borderWidth: 1,
-    alignSelf: 'center',
+    backgroundColor:'white',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.5,
+    shadowRadius: 5,
+    elevation: 5,
+    gap: 8
   },
   gridvertical: {
-    marginTop: 10,
-    width: '90%',
     alignSelf: 'center',
+    width:'100%'
   },
   notificationIcon: {
     position: 'relative',

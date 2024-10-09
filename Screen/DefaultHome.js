@@ -4,6 +4,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
 import CommonNavBtn from "../Components/CommonNavBtn";
 import EmergencyPage from "./EmergencyPage";
+import { color } from "react-native-elements/dist/helpers";
 
 
 export default function DefaultHome() {
@@ -48,16 +49,16 @@ export default function DefaultHome() {
     <View style={styles.container}>
       <View style={styles.topic}>
         <View style={styles.leftCorner}>
-          <Text style={{ fontSize: 35, marginBottom: 5 }}>Welcome</Text>
-          <Text style={{ fontSize: 25, fontWeight: 'bold' }}>to</Text>
-          <Text style={styles.text}>CareConnect</Text>
+          <Text style={{ fontSize: 25, fontWeight:'400', marginBottom: 5, color:'#003366' }}>Welcome</Text>
+          <Text style={{ fontSize: 25,fontWeight:'400', color:'#003366'  }}>to</Text>
+          <Text style={[styles.text,{color:'#003366'}]}>CareConnect</Text>
         </View>
 
         <View style={styles.rightCorner}>
           <CommonNavBtn
             onPress={handleSignInPress}
             title='Sign In'
-            style={{ marginVertical: 8 }}
+            style={{ marginVertical: 8,backgroundColor:'#003366'}}
           />
         </View>
       </View>
@@ -69,7 +70,8 @@ export default function DefaultHome() {
         <CommonNavBtn
           title='Clear Onboarding'
           onPress={clearOnboarding}
-          style={{ marginVertical: 8, backgroundColor: 'white' }}
+          style={{ marginHorizontal: 5 , backgroundColor:'#003366'}}
+
         />
       </View>
     </View>
@@ -79,6 +81,7 @@ export default function DefaultHome() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor:'white'
   },
   leftCorner: {
     position: 'absolute',
@@ -102,7 +105,7 @@ const styles = StyleSheet.create({
     left: 10,
     position: 'absolute',
     justifyContent: 'flex-end',
-    alignItems: 'baseline',
+    alignItems: 'baseline'
   },
   text: {
     fontSize: 40,
