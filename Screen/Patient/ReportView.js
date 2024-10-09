@@ -23,6 +23,7 @@ const ReportView = () => {
   }, [qrCodeValue]);
 
   return (
+
     <View style={styles.container}>
       {qrCodeValue && (
         <View style={styles.qrCodeContainer}>
@@ -32,7 +33,7 @@ const ReportView = () => {
             size={150}
           />
         </View>
-      )}
+   
     </View>
   );
 };

@@ -23,7 +23,7 @@ export const signUp =
     phoneNumber,
     address,
     nic,
-    dateOfBrirth,
+    dateOfBirth,
     education,
     hospital,
     jobStart
@@ -52,7 +52,7 @@ export const signUp =
         phoneNumber,
         address,
         nic,
-        dateOfBrirth,
+        dateOfBirth,
         education,
         hospital,
         jobStart,

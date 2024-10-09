@@ -306,10 +306,10 @@ export const getUserNotifications = async (userId) => {
           ...childSnapshot.val(),
         });
       });
-      console.log(`Notifications retrieved for user ${userId}:`, notifications);
+      
       return notifications;
     } else {
-      console.log(`No notifications found for user ${userId}`);
+      
       return [];
     }
   } catch (error) {
@@ -425,7 +425,6 @@ export const recordCancellation = async (selectedDate, cancellationReason) => {
 
     await set(newCancellationRef, cancellationData);
 
-    console.log('Cancellation record saved successfully:', cancellationData);
 
     return selectedDate;
   } catch (error) {
@@ -451,7 +450,6 @@ export const addNewsItem = async (title, description, date, imageUrl = null) => 
     const newNewsRef = push(newsFeedRef);
     await set(newNewsRef, newNewsItem);
 
-    console.log("News feed item successfully added:", newNewsItem);
     return newNewsItem;
   } catch (err) {
     console.error("Error adding news feed item:", err.message);
@@ -475,7 +473,7 @@ export const fetchNewsFeed = async () => {
         ...newsFeedData[newsId]
       }));
 
-      console.log("News feed items fetched:", newsItems);
+      
       return newsItems;
     } else {
       console.log("No news feed items found.");
@@ -494,6 +492,7 @@ export const deleteNewsFeedItem = async (newsId) => {
     const newsItemRef = child(dbRef, `newsFeed/${newsId}`);
 
     await remove(newsItemRef);
+
     console.log(`News feed item ${newsId} deleted.`);
   } catch (err) {
     console.error("Error deleting news feed item:", err);
@@ -508,7 +507,7 @@ export const updateNewsFeedItem = async (newsId, updatedFields) => {
     const newsItemRef = child(dbRef, `newsFeed/${newsId}`);
 
     await update(newsItemRef, updatedFields);
-    console.log(`News feed item ${newsId} updated with fields:`, updatedFields);
+    
   } catch (err) {
     console.error("Error updating news feed item:", err);
     throw err;
@@ -583,7 +582,7 @@ export const fetchAppointmentsForToday = async (setAppointments) => {
         setAppointments([]);
       }
     } else {
-      console.log("No clinic dates found for today");
+      
       setAppointments([]);
     }
   } catch (error) {

@@ -13,6 +13,7 @@ import HomeDoctor from "./Screen/Doctor/HomeDoctor";
 import HomeHP from "./Screen/HP/HomeHP";
 import HomePatient from "./Screen/Patient/HomePatient";
 import SigninAdmim from "./Screen/Login/SiginAdmin";
+import AboutService from "./Screen/AboutService";
 
 import { store } from "./store/store";
 
@@ -41,6 +42,7 @@ const MainStack = () => (
       <Stack.Screen name="Home Doctor" component={HomeDoctor} />
       <Stack.Screen name="Home Healthcare Provider" component={HomeHP} />
       <Stack.Screen name="Home Patient" component={HomePatient} />
+      <Stack.Screen name="About Service" component={AboutService} />
     </Stack.Navigator>
   </Provider>
 );
