@@ -387,13 +387,13 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 20,
     backgroundColor: "white",
-    width: "95%", // Fixed width percentage (removed space between %)
+    width: "95%", 
     shadowColor: "#000",
     shadowOffset: { width: 2, height: 5 },
     shadowOpacity: 0.3,
     shadowRadius: 5,
     elevation: 5,
-    marginVertical: 10, // Added for spacing below calendar
+    marginVertical: 10, 
   },
   upSection: {
     backgroundColor: "white",

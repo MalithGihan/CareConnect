@@ -61,15 +61,16 @@ export default function HomeDoctor() {
           let iconName;
 
           if (route.name === DashboardScreen) {
-            iconName = focused ? 'language' : 'language-outline';
+            iconName = focused ? 'calendar' : 'calendar';
           } else if (route.name === ProfileScreen) {
             iconName = focused ? 'person' : 'person-outline';
           } else if (route.name === SearchPatientScreen) {
-            iconName = focused ? 'globe' : 'globe-outline';
+            iconName = focused ? 'medical-outline' : 'medical-outline';
           } else if (route.name === PateintReportScannerScreen) {
-            iconName = focused ? 'globe' : 'globe-outline';
+            iconName = focused ? 'scan' : 'scan-outline';
           }
           return <Ionicons name={iconName} size={size} color={color} />;
+          
         },
         tabBarShowLabel: false,
         tabBarActiveTintColor: 'black',
@@ -90,13 +91,14 @@ export default function HomeDoctor() {
 
 const styles = StyleSheet.create({
   tabBar: {
+    position:'absolute',
     paddingBottom: 10,
     paddingHorizontal: 10,
     height: 60,
     marginBottom: 20,
     marginHorizontal: 20,
     borderRadius: 50,
-    backgroundColor: 'white',
+    backgroundColor: '#D9E4EC',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 5 },
     shadowOpacity: 0.3,

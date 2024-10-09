@@ -33,7 +33,7 @@ const ReportView = () => {
             size={150}
           />
         </View>
-        )}
+      )}
     </View>
   );
 };

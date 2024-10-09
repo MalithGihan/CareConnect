@@ -29,6 +29,12 @@ const SearchPatient = () => {
 
   return (
     <View style={styles.container}>
+      <View style={styles.headerContainer}>
+        <Text style={styles.titleText} numberOfLines={1}>
+          Medical History Management
+        </Text>
+      </View>
+
       <Text style={styles.subtitle}>Appointments for today:</Text>
       {appointments.length > 0 ? (
         <FlatList
@@ -61,7 +67,21 @@ const SearchPatient = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    backgroundColor: "#D9E4EC",
+    padding: 15,
+  },
+  headerContainer: {
+    flexDirection: "row",
+    width: "100%",
+    alignItems: "center",
+    marginBottom: 25,
+  },
+  titleText: {
+    fontSize: 20,
+    marginTop: 10,
+    color: "#003366",
+    flex: 1,
+    fontWeight: "900",
   },
   subtitle: {
     fontSize: 18,
