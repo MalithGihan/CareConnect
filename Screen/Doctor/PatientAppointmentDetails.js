@@ -1,78 +1,77 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, TextInput, Button, FlatList } from 'react-native';
-import { fetchPatientAppointments, fetchDoctorPrescription, handleAddNote } from '../../utils/actions/userActions';
+import { StyleSheet, Text, View, TextInput, Button, TouchableOpacity } from 'react-native';
+import { fetchPatientAppointments, fetchDoctorPrescriptions, handleAddNote, fetchPatientDetails } from '../../utils/actions/userActions';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 
 const PatientAppointmentDetails = ({ route }) => {
     const { patientId, date, time, venue } = route.params;
-    const [note, setNote] = useState('');
-    const [diagnosis, setDiagnosis] = useState('');
-    const [medications, setMedications] = useState('');
     const [prescriptions, setPrescriptions] = useState([]);
     const [appointmentKey, setAppointmentKey] = useState(null);
+    const [patientDetails, setPatientDetails] = useState({
+        username: '',
+        dateOfBirth: '',
+        address: ''
+    });
+    const navigation = useNavigation();
 
     useEffect(() => {
-        const loadPatientAppointments = async () => {
-            const key = await fetchPatientAppointments(patientId, date, setAppointmentKey, setPrescriptions);
-            if (key) {
-                await fetchDoctorPrescription(patientId, key, setPrescriptions);
-            }
+        const loadPatientDetails = async () => {
+            const details = await fetchPatientDetails(patientId);
+            setPatientDetails(details);
         };
 
-        loadPatientAppointments();
-    }, [date, patientId]);
+        loadPatientDetails();
+    }, [patientId]);
 
-    const handleAddPrescription = async () => {
-        await handleAddNote(patientId, appointmentKey, note, diagnosis, medications, setPrescriptions);
-        setNote('');
-        setDiagnosis('');
-        setMedications('');
-    };
+    useFocusEffect(
+        React.useCallback(() => {
+            const loadPatientAppointments = async () => {
+                const key = await fetchPatientAppointments(patientId, date, setAppointmentKey, setPrescriptions);
+                if (key) {
+                    await fetchDoctorPrescriptions(patientId, key, setPrescriptions);
+                }
+            };
+
+            loadPatientAppointments();
+        }, [patientId, date])
+    );
 
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Appointment Details</Text>
             <Text>Patient ID: {patientId}</Text>
+            <Text>Username: {patientDetails.username}</Text>
+            <Text>Date of Birth: {patientDetails.dateOfBirth}</Text>
+            <Text>Address: {patientDetails.address}</Text>
             <Text>Date: {date}</Text>
             <Text>Time: {time}</Text>
             <Text>Venue: {venue}</Text>
 
-            <TextInput
-                style={styles.input}
-                placeholder="Add a prescription for this appointment"
-                value={note}
-                onChangeText={setNote}
-            />
-            <TextInput
-                style={styles.input}
-                placeholder="Diagnosis"
-                value={diagnosis}
-                onChangeText={setDiagnosis}
-            />
-            <TextInput
-                style={styles.input}
-                placeholder="Medications"
-                value={medications}
-                onChangeText={setMedications}
-            />
-            <Button title="Add Prescription" onPress={handleAddPrescription} />
+            <TouchableOpacity
+                style={styles.button}
+                onPress={() => navigation.navigate('AddNoteScreen', { patientId, appointmentKey })}
+            >
+                <Text style={styles.buttonText}>ADD</Text>
+            </TouchableOpacity>
 
-            <Text style={styles.subtitle}>Prescriptions:</Text>
-            {prescriptions.length > 0 ? (
-                <FlatList
-                    data={prescriptions}
-                    renderItem={({ item }) => (
-                        <View style={styles.noteItem}>
-                            <Text>Note: {item.note}</Text>
-                            <Text>Diagnosis: {item.diagnosis}</Text>
-                            <Text>Medications: {item.medications}</Text>
-                            <Text>Added on: {new Date(item.createdAt).toLocaleString()}</Text>
-                        </View>
-                    )}
-                    keyExtractor={(item, index) => index.toString()}
-                />
-            ) : (
-                <Text>No prescriptions added yet.</Text>
-            )}
+            <TouchableOpacity
+                style={styles.button}
+                onPress={() => navigation.navigate('Prescription', { prescriptions, patientId, appointmentKey })}
+            >
+                <Text style={styles.buttonText}>EDIT</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+                style={styles.button}
+                onPress={() => navigation.navigate('DeleteNoteScreen', { prescriptions, patientId, appointmentKey })}
+            >
+                <Text style={styles.buttonText}>DELETE</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+                style={styles.button}
+                onPress={() => navigation.navigate('ViewMedicalHistoryScreen', { patientId })}
+            >
+                <Text style={styles.buttonText}>ALLVIEW</Text>
+            </TouchableOpacity>
         </View>
     );
 };
@@ -94,17 +93,16 @@ const styles = StyleSheet.create({
         marginBottom: 20,
         paddingLeft: 10,
     },
-    subtitle: {
-        fontSize: 18,
-        fontWeight: 'bold',
+    button: {
         marginTop: 20,
-        marginBottom: 10,
-    },
-    noteItem: {
+        backgroundColor: '#007bff',
         padding: 10,
-        borderBottomWidth: 1,
-        borderBottomColor: '#ccc',
-        marginBottom: 10,
+        borderRadius: 5,
+        alignItems: 'center',
+    },
+    buttonText: {
+        color: '#fff',
+        fontWeight: 'bold',
     },
 });
 

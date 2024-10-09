@@ -264,13 +264,13 @@ export default function ScheduleView() {
       )}
 
       {isClinicDate && (
-        <LinearGradient
-          colors={["rgba(0, 51, 102, 0.2)", "rgba(0, 191, 165, 0.2)"]}
+        <TouchableOpacity
+          colors={['rgba(0, 51, 102, 0.2)', 'rgba(0, 191, 165, 0.2)']}
           style={styles.floatingButton}
           onPress={handleAddNotePress}
         >
           <Ionicons name="add" size={30} color="white" />
-        </LinearGradient>
+        </TouchableOpacity>
       )}
     </View>
   );
@@ -302,11 +302,13 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   sectionTitle: {
+
     fontSize: 20,
     fontWeight: "900",
     marginVertical:15,
     marginHorizontal:5,
     color: "#003366",
+
   },
   appointmentItem: {
     marginHorizontal:5,
@@ -396,6 +398,7 @@ const styles = StyleSheet.create({
   upSection: {
     backgroundColor: "white",
     margin: 10,
+
     marginHorizontal: 15,
     flex: 1,
     borderRadius: 15,
@@ -409,10 +412,12 @@ const styles = StyleSheet.create({
   bottomSection: {
     marginHorizontal: 15,
     flex: 1,
-    paddingBottom: 10,
+    paddingBottom: 10
+
   },
   Section: {
     flex: 1,
-    marginHorizontal: 10,
-  },
+    marginHorizontal: 10
+  }
 });
+

@@ -8,6 +8,11 @@ import DProfile from './DProfile';
 import QRscanner from '../Common/QRscanner';
 import SearchPatient from './SearchPatient';
 import PatientAppointmentDetails from "./PatientAppointmentDetails"
+import AddNoteScreen from './AddNoteScreen';
+import Prescription from './Prescription';
+import DeleteNoteScreen from './DeleteNoteScreen';
+import ViewMedicalHistoryScreen from './ViewMedicalHistoryScreen';
+import PatientNotesScreen from './PatientNotesScreen';
 
 const DashboardScreen = 'DashboardDoctor'
 const SearchPatientScreen = 'SearchPatient'
@@ -38,7 +43,11 @@ function AddReportStack() {
     <Stack.Navigator>
       <Stack.Screen name='Search Patient' component={SearchPatient} options={{ headerShown: false }} />
       <Stack.Screen name="PatientAppointmentDetails" component={PatientAppointmentDetails} options={{ headerShown: false }} />
-
+      <Stack.Screen name="AddNoteScreen" component={AddNoteScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="Prescription" component={Prescription} options={{ headerShown: false }} />
+      <Stack.Screen name="DeleteNoteScreen" component={DeleteNoteScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="ViewMedicalHistoryScreen" component={ViewMedicalHistoryScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="PatientNotesScreen" component={PatientNotesScreen} options={{ headerShown: false }} />
     </Stack.Navigator>
   )
 }
