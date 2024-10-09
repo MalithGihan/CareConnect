@@ -28,7 +28,7 @@ const initialState = {
     phoneNumber: "",
     address: "",
     nic: "",
-    dateOfBrirth: "",
+    dateOfBirth: "",
     education: "",
     hospital: "",
     jobStart: "",
@@ -42,7 +42,7 @@ const initialState = {
     phoneNumber: false,
     address: false,
     nic: false,
-    dateOfBrirth: false,
+    dateOfBirth: false,
     education: false,
     hospital: false,
     jobStart: false,
@@ -82,7 +82,7 @@ export default SignUp = () => {
         formState.inputValues.phoneNumber,
         formState.inputValues.address,
         formState.inputValues.nic,
-        formState.inputValues.dateOfBrirth,
+        formState.inputValues.dateOfBirth,
         formState.inputValues.education,
         formState.inputValues.hospital,
         formState.inputValues.jobStart
@@ -196,10 +196,10 @@ export default SignUp = () => {
           />
           <CustomInput
             id="dateOfBrirth"
-            value={formState.inputValues.dateOfBrirth}
+            value={formState.inputValues.dateOfBirth}
             placeholder="Date Of Brirth"
             placeholderTextColor="gray"
-            errorText={formState.inputValidities.dateOfBrirth}
+            errorText={formState.inputValidities.dateOfBirth}
             onInputChanged={inputChangedHandler}
           />
           <CustomInput

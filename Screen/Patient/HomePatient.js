@@ -54,7 +54,6 @@ function ProfileStack() {
   return (
     <Stack.Navigator>
       <Stack.Screen name='User Profile' component={Patient_Profile} options={{ headerShown: false }} />
-      
     </Stack.Navigator>
   )
 }
