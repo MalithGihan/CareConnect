@@ -13,75 +13,74 @@ import { getUserData } from "./userActions";
 import { clearAuth } from "../../store/authSlice";
 
 //Sign Up Hook
-export const signUp =
-  (
-    userName,
-    email,
-    password,
-    role,
-    fullName,
-    phoneNumber,
-    address,
-    nic,
-    dateOfBirth,
-    education,
-    hospital,
-    jobStart
-  ) =>
-  async (dispatch) => {
-    const app = getFirebaseApp();
-    const auth = getAuth(app);
+export const signUp = (
+  userName,
+  email,
+  password,
+  role,
+  fullName,
+  phoneNumber,
+  address,
+  nic,
+  dateOfBirth,
+  education,
+  hospital,
+  jobStart
+) => async (dispatch) => {
+  const app = getFirebaseApp();
+  const auth = getAuth(app);
 
-    try {
-      const result = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
+  try {
+    const result = await createUserWithEmailAndPassword(auth, email, password);
 
-      const { uid, stsTokenManager } = result.user;
-      const { accessToken, expirationTime } = stsTokenManager;
-      const expiryDate = new Date(expirationTime);
+    const { uid, stsTokenManager } = result.user;
+    const { accessToken, expirationTime } = stsTokenManager;
+    const expiryDate = new Date(expirationTime);
 
-      const userData = await createUser(
-        userName,
-        email,
-        password,
-        role,
-        fullName,
-        phoneNumber,
-        address,
-        nic,
-        dateOfBirth,
-        education,
-        hospital,
-        jobStart,
-        uid
-      );
+   
+    const medicalRecords = [];
 
-      dispatch(authenticate({ token: accessToken, userData }));
+    const userData = await createUser(
+      userName,
+      email,
+      password,
+      role,
+      fullName,
+      phoneNumber,
+      address,
+      nic,
+      dateOfBirth,
+      education,
+      hospital,
+      jobStart,
+      uid,
+      medicalRecords 
+    );
 
-      saveToDataStorage(accessToken, uid, expiryDate);
-    } catch (error) {
-      console.log(error);
+    dispatch(authenticate({ token: accessToken, userData }));
 
-      const errorCode = error.code;
-      let message = "Something went wrong";
+    saveToDataStorage(accessToken, uid, expiryDate);
+  } catch (error) {
+    console.log(error);
 
-      if (
-        errorCode === "auth/wrong-password" ||
-        errorCode === "auth/user-not-found"
-      ) {
-        message = "Wrong email or password";
-      }
+    const errorCode = error.code;
+    let message = "Something went wrong";
 
-      if (errorCode === "auth/email-already-in-use") {
-        message = "Email already in use";
-      }
-
-      throw new Error(message);
+    if (
+      errorCode === "auth/wrong-password" ||
+      errorCode === "auth/user-not-found"
+    ) {
+      message = "Wrong email or password";
     }
-  };
+
+    if (errorCode === "auth/email-already-in-use") {
+      message = "Email already in use";
+    }
+
+    throw new Error(message);
+  }
+};
+
 
 //Sign In Hook
 export const signIn = (email, password) => {
@@ -125,6 +124,7 @@ export const signIn = (email, password) => {
   };
 };
 
+
 //logout
 export const logout = async (dispatch, navigation) => {
   const auth = getAuth();
@@ -141,6 +141,7 @@ export const logout = async (dispatch, navigation) => {
   }
 };
 
+
 const createUser = async (
   userName,
   email,
@@ -150,11 +151,12 @@ const createUser = async (
   phoneNumber,
   address,
   nic,
-  dateOfBrirth,
+  dateOfBirth,
   education,
   hospital,
   jobStart,
-  userId
+  userId,
+  medicalRecords 
 ) => {
   let userData = {
     userName,
@@ -165,14 +167,16 @@ const createUser = async (
     phoneNumber,
     address,
     nic,
-    dateOfBrirth,
+    dateOfBirth,
     education,
     hospital,
     jobStart,
     userId,
     signUpDate: new Date().toISOString(),
+    medicalRecords, 
   };
 
+  
   Object.keys(userData).forEach(key => {
     if (userData[key] === undefined) {
       delete userData[key];
@@ -185,6 +189,7 @@ const createUser = async (
 
   return userData;
 };
+
 
 
 const saveToDataStorage = (token, userId, expiryDate) => {

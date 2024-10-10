@@ -550,10 +550,10 @@ export const fetchAppointmentsForToday = async (setAppointments) => {
 
   try {
     const db = getDatabase();
-    // const today = new Date().toISOString().split('T')[0];
+    //const today = new Date().toISOString().split('T')[0];
     const yesterday = new Date();
     const tomorrow = new Date(yesterday);
-    tomorrow.setDate(yesterday.getDate() + 3);
+    tomorrow.setDate(yesterday.getDate() + 1);
     const today = tomorrow.toISOString().split('T')[0];
 
     const dateRef = ref(db, `user/${userId}/clinicDates/`);

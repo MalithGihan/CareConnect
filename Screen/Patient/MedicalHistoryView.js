@@ -70,7 +70,7 @@ export default function MedicalHistoryView() {
           <Ionicons name="arrow-back-circle" size={40} color="#003366" />
         </TouchableOpacity>
         <Text style={styles.headerTitle} numberOfLines={1}>
-          Schedule Management
+          Medical History
         </Text>
         <View style={styles.rightCorner}>
           <Pressable
