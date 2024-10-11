@@ -31,12 +31,13 @@ export const getAllPatients = async () => {
       const usersData = snapshot.val();
 
       const patients = Object.keys(usersData)
-        .filter(userId => usersData[userId].role === 'patient')
-        .map(userId => ({
+        .filter((userId) => usersData[userId].role === 'patient')
+        .map((userId) => ({
           id: userId,
-          name: usersData[userId].name,
-          email: usersData[userId].email,
-          clinicDate: usersData[userId].clinicDate
+          name: usersData[userId].fullName || usersData[userId].userName || '',
+          email: usersData[userId].email || '',
+          nic: usersData[userId].nic || '',
+          clinicDate: usersData[userId].clinicDate || '',
         }));
 
       return patients;
@@ -44,10 +45,11 @@ export const getAllPatients = async () => {
       return [];
     }
   } catch (err) {
-    console.error("Error fetching patients:", err);
+    console.error('Error fetching patients:', err);
     return [];
   }
 };
+
 
 export const AddClinicDate = async (userId, newClinicDate, doctorId, doctorName, venue, time) => {
   try {
