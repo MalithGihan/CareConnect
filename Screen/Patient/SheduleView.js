@@ -15,6 +15,7 @@ import {
   getUserClinicAppointments,
   getUserNotes,
   getUserNotifications,
+  deleteUserNote,
 } from "../../utils/actions/userActions";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
@@ -109,20 +110,36 @@ export default function ScheduleView() {
     }
   };
 
+  const handleDeleteNote = async (appointmentId, noteId) => {
+    try {
+      await deleteUserNote(userData.userId, appointmentId, noteId);
+      fetchUserNotes(userData.userId); 
+      ToastAndroid.show("Note deleted successfully", ToastAndroid.SHORT);
+    } catch (error) {
+      console.error("Error deleting note:", error);
+      Alert.alert("Error", "Failed to delete note. Please try again.");
+    }
+  };
+
   const renderAppointment = ({ item }) => (
     <View style={styles.appointmentItem}>
-      <Text style={[styles.appointmentText,{fontSize:15,fontWeight:"300",marginBottom:10}]}>Your next clinic appointment has been scheduled as follows:</Text>
-      <Text style={[styles.appointmentText,{fontSize:25,fontWeight:"900"}]}>Dr. {item.doctor}</Text>
-      <Text style={[styles.appointmentText,{fontSize:20,fontWeight:"900"}]}>Venue: {item.venue}</Text>
-      <Text style={[styles.appointmentText,{fontSize:20,fontWeight:"900"}]}>Time: {item.time}</Text>
-      <Text style={[styles.appointmentText,{fontSize:15,fontWeight:"300",marginTop:10}]}>Please arrive on time and bring any necessary documents.</Text>
+      <Text style={[styles.appointmentText, { fontSize: 15, fontWeight: "300", marginBottom: 10 }]}>Your next clinic appointment has been scheduled as follows:</Text>
+      <Text style={[styles.appointmentText, { fontSize: 25, fontWeight: "900" }]}>Dr. {item.doctor}</Text>
+      <Text style={[styles.appointmentText, { fontSize: 20, fontWeight: "900" }]}>Venue: {item.venue}</Text>
+      <Text style={[styles.appointmentText, { fontSize: 20, fontWeight: "900" }]}>Time: {item.time}</Text>
+      <Text style={[styles.appointmentText, { fontSize: 15, fontWeight: "300", marginTop: 10 }]}>Please arrive on time and bring any necessary documents.</Text>
     </View>
   );
 
   const renderNote = ({ item }) => (
     <View style={styles.appointmentItem}>
-      <Text style={[styles.appointmentText,{fontSize:15,fontWeight:"300",marginBottom:10}]}>{item.text}</Text>
-      <Text style={[styles.appointmentText,{fontSize:12,fontWeight:"600",marginTop:10}]}>
+      <View style={styles.noteHeader}>
+        <Text style={[styles.appointmentText, { fontSize: 15, fontWeight: "300", flex: 1 }]}>{item.text}</Text>
+        <TouchableOpacity onPress={() => handleDeleteNote(setSelectedDate.id, item.id)}>
+          <Ionicons name="trash-outline" size={24} color="#FF4136" />
+        </TouchableOpacity>
+      </View>
+      <Text style={[styles.appointmentText, { fontSize: 12, fontWeight: "600", marginTop: 10 }]}>
         {new Date(item.timestamp).toLocaleString()}
       </Text>
     </View>
@@ -136,6 +153,7 @@ export default function ScheduleView() {
       navigation.navigate("AddNote", {
         userId: userData.userId,
         appointmentId: selectedAppointment.id,
+        selectedDate: selectedDate
       });
     } else {
       ToastAndroid.show(
@@ -176,30 +194,13 @@ export default function ScheduleView() {
 
   return (
     <View style={styles.container}>
-      <View
-        style={{
-          flexDirection: "row",
-          width: "100%",
-          alignItems: "center",
-          marginBottom: 25,
-        }}
-      >
+      <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.navigate("Dashbord")}>
           <Ionicons name="arrow-back-circle" size={40} color="#003366" />
         </TouchableOpacity>
-        <Text
-          style={{
-            fontSize: 20,
-            marginLeft: 15,
-            color: "#003366",
-            flex: 1,
-            fontWeight: "900",
-          }}
-          numberOfLines={1}
-        >
+        <Text style={styles.headerTitle} numberOfLines={1}>
           Schedule Management
         </Text>
-
         <View style={styles.rightCorner}>
           <Pressable
             onPress={() => navigation.navigate("notifications")}
@@ -230,9 +231,9 @@ export default function ScheduleView() {
           }
           ListHeaderComponent={() => (
             <View>
-                <Text style={styles.sectionTitle}>
-                  {formatDate(selectedDate)}
-                </Text>
+              <Text style={styles.sectionTitle}>
+                {formatDate(selectedDate)}
+              </Text>
             </View>
           )}
           ListFooterComponent={() => (
@@ -240,32 +241,27 @@ export default function ScheduleView() {
               colors={["rgba(0, 191, 165, 0.3)", "rgba(0, 51, 102, 0.3)"]}
               style={styles.detailsSection}
             >
-              <Text
-                style={[styles.sectionTitle,{}]}
-              >
-                Notes
-              </Text>
+              <Text style={styles.sectionTitle}>Notes</Text>
               <FlatList
                 data={
                   notes[selectedDate] ? Object.values(notes[selectedDate]) : []
                 }
                 renderItem={renderNote}
                 keyExtractor={(item, index) =>
-                  item.timestamp ? item.timestamp.toString() : index.toString()
+                  item.id ? item.id.toString() : index.toString()
                 }
-                ListEmptyComponent={<Text style={[styles.appointmentText,{fontSize:15,fontWeight:"300",marginBottom:10,marginHorizontal:5}]}>No notes for this date.</Text>}
-                nestedScrollEnabled={true} 
+                ListEmptyComponent={<Text style={styles.emptyNoteText}>No notes for this date.</Text>}
+                nestedScrollEnabled={true}
               />
             </LinearGradient>
           )}
-          ListEmptyComponent={<Text>No appointments for this date.</Text>}
-          nestedScrollEnabled={true} 
+          ListEmptyComponent={<Text style={styles.emptyAppointmentText}>No appointments for this date.</Text>}
+          nestedScrollEnabled={true}
         />
       )}
 
       {isClinicDate && (
         <TouchableOpacity
-          colors={['rgba(0, 51, 102, 0.2)', 'rgba(0, 191, 165, 0.2)']}
           style={styles.floatingButton}
           onPress={handleAddNotePress}
         >
@@ -282,6 +278,19 @@ const styles = StyleSheet.create({
     backgroundColor: "#D9E4EC",
     padding: 15,
   },
+  header: {
+    flexDirection: "row",
+    width: "100%",
+    alignItems: "center",
+    marginBottom: 25,
+  },
+  headerTitle: {
+    fontSize: 20,
+    marginLeft: 15,
+    color: "#003366",
+    flex: 1,
+    fontWeight: "900",
+  },
   rightCorner: {
     position: "absolute",
     top: 5,
@@ -291,29 +300,28 @@ const styles = StyleSheet.create({
   detailsSection: {
     borderRadius: 20,
     marginTop: 25,
-    marginBottom:150,
+    marginBottom: 150,
     paddingVertical: 10,
-    paddingHorizontal: 15, 
-    backgroundColor: "white", 
-    shadowColor: "#000", 
+    paddingHorizontal: 15,
+    backgroundColor: "white",
+    shadowColor: "#000",
     shadowOffset: { width: 2, height: 5 },
     shadowOpacity: 0.3,
     shadowRadius: 5,
     elevation: 5,
   },
   sectionTitle: {
-
     fontSize: 20,
     fontWeight: "900",
-    marginVertical:15,
-    marginHorizontal:5,
+    marginVertical: 15,
+    marginHorizontal: 5,
     color: "#003366",
-
   },
   appointmentItem: {
-    marginHorizontal:5,
+    marginVertical: 8,
+    marginHorizontal: 5,
     padding: 15,
-    gap:5,
+    gap: 5,
     backgroundColor: "white",
     borderRadius: 20,
     shadowColor: "#000",
@@ -325,23 +333,10 @@ const styles = StyleSheet.create({
   appointmentText: {
     color: "#003366",
   },
-  noteItem: {
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
-    marginVertical: 10,
-    marginHorizontal: 15,
-    backgroundColor: "#FFF",
-    borderRadius: 15,
-    shadowColor: "#000",
-    shadowOffset: { width: 2, height: 3 },
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
-    elevation: 3,
-  },
-  timestamp: {
-    fontSize: 12,
-    color: "#888",
+  noteHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   floatingButton: {
     position: "absolute",
@@ -358,7 +353,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.5,
     shadowRadius: 3,
     elevation: 5,
-    zIndex:1
+    zIndex: 1
   },
   notificationIcon: {
     position: "relative",
@@ -387,37 +382,26 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 20,
     backgroundColor: "white",
-    width: "95%", 
+    width: "95%",
     shadowColor: "#000",
     shadowOffset: { width: 2, height: 5 },
     shadowOpacity: 0.3,
     shadowRadius: 5,
     elevation: 5,
-    marginVertical: 10, 
+    marginVertical: 10,
   },
-  upSection: {
-    backgroundColor: "white",
-    margin: 10,
-
-    marginHorizontal: 15,
-    flex: 1,
-    borderRadius: 15,
-    padding: 10, // Added padding inside the section
-    shadowColor: "#000",
-    shadowOffset: { width: 2, height: 3 },
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
-    elevation: 3,
+  emptyNoteText: {
+    fontSize: 15,
+    fontWeight: "300",
+    marginBottom: 10,
+    marginHorizontal: 5,
+    color: "#003366",
   },
-  bottomSection: {
-    marginHorizontal: 15,
-    flex: 1,
-    paddingBottom: 10
-
+  emptyAppointmentText: {
+    fontSize: 15,
+    fontWeight: "300",
+    marginTop: 10,
+    textAlign: "center",
+    color: "#003366",
   },
-  Section: {
-    flex: 1,
-    marginHorizontal: 10
-  }
 });
-

@@ -109,7 +109,7 @@ export const getUserClinicAppointments = async (userId) => {
 };
 
 
-export const addUserNote = async (userId, appointmentId, noteText) => {
+export const addUserNote = async (userId, date, noteText) => {
   try {
     const app = getFirebaseApp();
     const dbRef = ref(getDatabase(app));
@@ -117,17 +117,28 @@ export const addUserNote = async (userId, appointmentId, noteText) => {
     const snapshot = await get(userRef);
     const userData = snapshot.val();
 
-    const updatedAppointments = userData.clinicAppointments.map(appointment => {
-      if (appointment.id === appointmentId) {
-        const newNote = { text: noteText, timestamp: Date.now() };
-        const notes = appointment.notes ? [...appointment.notes, newNote] : [newNote];
-        return { ...appointment, notes };
-      }
-      return appointment;
-    });
+    if (!userData.clinicAppointments) {
+      throw new Error("No clinic appointments found for this user");
+    }
 
-    await update(userRef, { clinicAppointments: updatedAppointments });
-    console.log(`Note added for user ${userId} for appointment ${appointmentId}`);
+    const appointmentIndex = userData.clinicAppointments.findIndex(
+      appointment => appointment.date === date
+    );
+
+    if (appointmentIndex === -1) {
+      throw new Error(`No appointment found for date ${date}`);
+    }
+
+    const newNote = { text: noteText, timestamp: Date.now() };
+
+    if (!userData.clinicAppointments[appointmentIndex].notes) {
+      userData.clinicAppointments[appointmentIndex].notes = [];
+    }
+
+    userData.clinicAppointments[appointmentIndex].notes.push(newNote);
+
+    await update(userRef, { clinicAppointments: userData.clinicAppointments });
+    console.log(`Note added for user ${userId} for date ${date}`);
   } catch (err) {
     console.error("Error adding note:", err);
     throw err;
@@ -1015,5 +1026,46 @@ export const saveUser = async (user, username, email, phoneNumber, address) => {
   } catch (error) {
     console.error('Error updating user:', error);
     throw error;
+  }
+};
+
+export const deleteUserNote = async (userId, appointmentId, noteId) => {
+  try {
+    const app = getFirebaseApp();
+    const dbRef = ref(getDatabase(app));
+    const userRef = child(dbRef, `user/${userId}`);
+
+    const snapshot = await get(userRef);
+    const userData = snapshot.val();
+
+    const appointmentIndex = userData.clinicAppointments.findIndex(
+      appointment => appointment.id === appointmentId
+    );
+
+    if (appointmentIndex === -1) {
+      throw new Error("Appointment not found");
+    }
+
+    const appointment = userData.clinicAppointments[appointmentIndex];
+
+    if (appointment.notes) {
+      const noteIndex = appointment.notes.findIndex(note => note.id === noteId);
+      if (noteIndex !== -1) {
+        appointment.notes.splice(noteIndex, 1);
+      } else {
+        throw new Error("Note not found in the specified appointment");
+      }
+    } else {
+      throw new Error("No notes found for this appointment");
+    }
+
+    userData.clinicAppointments[appointmentIndex] = appointment;
+
+    await update(userRef, { clinicAppointments: userData.clinicAppointments });
+
+    console.log(`Note deleted for user ${userId} from appointment ${appointmentId}`);
+  } catch (err) {
+    console.error("Error deleting note:", err);
+    throw err;
   }
 };
