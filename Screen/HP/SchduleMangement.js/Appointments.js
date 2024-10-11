@@ -12,9 +12,7 @@ export default function Appointments() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    height: 300,
-  },
-  appointment: {
-    height: 300
+    backgroundColor: "#D9E4EC",
+    padding: 15,
   }
 })

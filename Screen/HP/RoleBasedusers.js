@@ -13,7 +13,7 @@ import { getUsersByRole } from "../../utils/actions/userActions";
 import { Ionicons } from "@expo/vector-icons";
 import AntDesign from "@expo/vector-icons/AntDesign";
 
-const RoleBasedUsers = () => {
+const RoleBasedUsers = (navigate) => {
   const [roleFilter, setRoleFilter] = useState("patient");
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState(""); // To handle search input
