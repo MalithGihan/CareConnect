@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, Text, TextInput, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, Text, TextInput, TouchableOpacity,Alert } from 'react-native';
 import { addUserNote } from '../../utils/actions/userActions';
 import { useNavigation } from '@react-navigation/native';
 import Ionicons from "@expo/vector-icons/Ionicons";
@@ -15,10 +15,14 @@ export default function Addnote({ route }) {
     if (noteText.trim() !== '') {
       try {
         await addUserNote(userId, selectedDate, noteText);
+        Alert.alert("Success", "Note added successfully");
         navigation.goBack();
       } catch (error) {
         console.error("Error adding note:", error);
+        Alert.alert("Error", "Failed to add note. Please try again.");
       }
+    } else {
+      Alert.alert("Error", "Please enter a note before submitting.");
     }
   };
 
