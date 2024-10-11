@@ -11,6 +11,8 @@ import ReportManage from '../Common/ReportManage';
 import ClinicDateSelection from './SchduleMangement.js/ClinicDateSelection';
 import HomeScreenHP from '../HP/HomeScreenHP';
 import UserCreate from './UserCreate';
+import RoleBasedUsers from './RoleBasedusers';
+import UserEdit from './UserEdit';
 
 const DashboardScreen = 'DashboardHP'
 const SheduleManageScreen = 'SearchPatient'
@@ -18,7 +20,7 @@ const ProfileScreen = 'DProfile'
 const PateintReportScannerScreen = 'QRscanner'
 const ReportManageScreen = 'ReportManage'
 const ClinicScreen = 'HomeScreenHP';
-const UserCreatescreen = 'UserCreate';
+const UserCreatescreen = 'RoleBasedUsers';
 
 
 const Tab = createBottomTabNavigator();
@@ -76,7 +78,9 @@ function ClinicMangementStack() {
 function UserMangementStack() {
   return (
     <Stack.Navigator>
+      <Stack.Screen name="RoleBasedUsers" component={RoleBasedUsers} options={{ headerShown: false }} />
       <Stack.Screen name="UserCreate" component={UserCreate} options={{ headerShown: false }} />
+      <Stack.Screen name="UserEdit" component={UserEdit} options={{ headerShown: false }} />
     </Stack.Navigator>
   );
 }
@@ -89,13 +93,13 @@ export default function HomeHP() {
           let iconName;
 
           if (route.name === DashboardScreen) {
-            iconName = focused ? 'home' : 'home-outline'; 
+            iconName = focused ? 'home' : 'home-outline';
           } else if (route.name === ProfileScreen) {
-            iconName = focused ? 'person' : 'person-outline'; 
+            iconName = focused ? 'person' : 'person-outline';
           } else if (route.name === SheduleManageScreen) {
-            iconName = focused ? 'calendar' : 'calendar-outline'; 
+            iconName = focused ? 'calendar' : 'calendar-outline';
           } else if (route.name === PateintReportScannerScreen) {
-            iconName = focused ? 'camera' : 'camera-outline'; 
+            iconName = focused ? 'camera' : 'camera-outline';
           } else if (route.name === ReportManageScreen) {
             iconName = focused ? 'newspaper' : 'newspaper-outline';
           } else if (route.name === UserCreatescreen) {

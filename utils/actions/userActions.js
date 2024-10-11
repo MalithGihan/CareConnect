@@ -308,10 +308,10 @@ export const getUserNotifications = async (userId) => {
           ...childSnapshot.val(),
         });
       });
-      
+
       return notifications;
     } else {
-      
+
       return [];
     }
   } catch (error) {
@@ -475,7 +475,7 @@ export const fetchNewsFeed = async () => {
         ...newsFeedData[newsId]
       }));
 
-      
+
       return newsItems;
     } else {
       console.log("No news feed items found.");
@@ -509,7 +509,7 @@ export const updateNewsFeedItem = async (newsId, updatedFields) => {
     const newsItemRef = child(dbRef, `newsFeed/${newsId}`);
 
     await update(newsItemRef, updatedFields);
-    
+
   } catch (err) {
     console.error("Error updating news feed item:", err);
     throw err;
@@ -584,7 +584,7 @@ export const fetchAppointmentsForToday = async (setAppointments) => {
         setAppointments([]);
       }
     } else {
-      
+
       setAppointments([]);
     }
   } catch (error) {
@@ -957,6 +957,63 @@ export const savePrescription = async (patientId, appointmentKey, prescriptionId
     await update(prescriptionRef, updatedData);
   } catch (error) {
     console.error('Error updating prescription:', error);
+    throw error;
+  }
+};
+
+export const getUsersByRole = async (role) => {
+  try {
+    const app = getFirebaseApp();
+    const dbRef = ref(getDatabase(app));
+    const usersRef = child(dbRef, 'user');
+
+    const snapshot = await get(usersRef);
+
+    if (snapshot.exists()) {
+      const usersData = snapshot.val();
+      const usersByRole = Object.keys(usersData)
+        .filter(userId => usersData[userId].role === role)
+        .map(userId => ({
+          id: userId,
+          username: usersData[userId].userName,
+          name: usersData[userId].fullName,
+          email: usersData[userId].email,
+          phoneNumber: usersData[userId].phoneNumber,
+          role: usersData[userId].role,
+          address: usersData[userId].address,
+          dateOfBirth: usersData[userId].dateOfBirth,
+        }));
+
+      return usersByRole;
+    } else {
+      return [];
+    }
+  } catch (err) {
+    console.error(`Error fetching ${role}s:`, err);
+    return [];
+  }
+};
+
+export const saveUser = async (user, username, email, phoneNumber, address) => {
+  try {
+    if (user) {
+      const app = getFirebaseApp();
+      const dbRef = ref(getDatabase(app));
+      const userDocRef = child(dbRef, `user/${user.id}`);
+
+      await update(userDocRef, {
+        userName: username,
+        email: email,
+        phoneNumber: phoneNumber,
+        address: address
+      });
+
+      console.log('User updated:', user.id);
+    } else {
+      console.error('No user provided for update');
+    }
+  } catch (error) {
+    console.error('Error updating user:', error);
     throw error;
   }
 };
