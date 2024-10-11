@@ -182,7 +182,7 @@ export default SignIn = () => {
               }}
             />
             <View style={styles.bottomContainer}>
-              <TouchableOpacity onPress={() => navigation.navigate("Sign Up")}>
+              <TouchableOpacity onPress={() => navigation.navigate("About Service")}>
                 <Text
                   style={{ fontSize: 14, fontWeight: "800", color: "black" }}
                 >
