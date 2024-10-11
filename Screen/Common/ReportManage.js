@@ -4,23 +4,35 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 export default function ReportManage() {
     return (
-        <LinearGradient
-            colors={['#4c669f', '#3b5998', '#192f6a']}  // Customize your colors
-            style={styles.container}
-        >
-            <Text style={styles.text}>Report</Text>
-        </LinearGradient>
-    );
+        <View style={styles.mainContainer}>
+      <View style={styles.headerContainer}>
+        <Text style={styles.titleText} numberOfLines={1}>
+          Report Management
+        </Text>
+      </View>
+    </View>
+  )
 }
 
 const styles = StyleSheet.create({
-    container: {
+    mainContainer: {
         flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    text: {
-        color: '#fff',
-        fontSize: 20,
-    }
+        backgroundColor: "#D9E4EC",
+        width: "100%",
+        padding: 15,
+      },
+      headerContainer: {
+        flexDirection: "row",
+        width: "100%",
+        alignItems: "center",
+        marginBottom: 25,
+      },
+      titleText: {
+        fontSize: 25,
+        marginTop: 10,
+        color: "#003366",
+        flex: 1,
+        fontWeight: "900",
+      },
+      
 });

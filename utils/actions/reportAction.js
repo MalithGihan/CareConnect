@@ -53,29 +53,16 @@ export const getMedicalReports = async (userId) => {
 
 
 
-export const updateMedicalReport = async (userId, reportIndex, updatedReport) => {
+export const updateMedicalReport = async (userId, reportId, updatedReport) => {
   try {
     const app = getFirebaseApp();
     const db = getDatabase(app);
-    const userRef = ref(db, `user/${userId}`);
+    const userRef = ref(db, `user/${userId}/medicalRecords/${reportId}`);
 
-    // Fetch current medical records
-    const snapshot = await get(child(userRef, 'medicalRecords'));
-    if (snapshot.exists()) {
-      let medicalRecords = snapshot.val();
-
-      if (reportIndex >= 0 && reportIndex < medicalRecords.length) {
-        medicalRecords[reportIndex] = updatedReport;
-
-        // Update the database
-        await update(userRef, { medicalRecords });
-        return medicalRecords;
-      } else {
-        throw new Error('Report index out of bounds');
-      }
-    } else {
-      throw new Error('No medical records found');
-    }
+    // Update the specific medical report using the report ID
+    await update(userRef, updatedReport);
+    
+    return updatedReport;
   } catch (error) {
     console.error('Error updating medical report:', error);
     throw error;
@@ -84,32 +71,21 @@ export const updateMedicalReport = async (userId, reportIndex, updatedReport) =>
 
 
 
-export const deleteMedicalReport = async (userId, reportIndex) => {
+export const deleteMedicalReport = async (userId, recordId) => {
   try {
     const app = getFirebaseApp();
     const db = getDatabase(app);
-    const userRef = ref(db, `user/${userId}`);
+    const recordRef = ref(db, `user/${userId}/medicalRecords/${recordId}`);
 
-    // Fetch current medical records
-    const snapshot = await get(child(userRef, 'medicalRecords'));
-    if (snapshot.exists()) {
-      let medicalRecords = snapshot.val();
-
-      if (reportIndex >= 0 && reportIndex < medicalRecords.length) {
-        medicalRecords.splice(reportIndex, 1);
-
-        // Update the database
-        await update(userRef, { medicalRecords });
-        return medicalRecords;
-      } else {
-        throw new Error('Report index out of bounds');
-      }
-    } else {
-      throw new Error('No medical records found');
-    }
+    // Remove the specific medical record
+    await remove(recordRef);
+    console.log('Record deleted successfully');
   } catch (error) {
     console.error('Error deleting medical report:', error);
     throw error;
   }
 };
+
+
+
 

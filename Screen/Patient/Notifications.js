@@ -55,7 +55,10 @@ export default function Notifications() {
   const renderNotification = ({ item }) => {
     if (item.title) {
       return (
-        <View style={styles.notificationItem}>
+        <LinearGradient
+        colors={["rgba(0, 51, 102, 0.1)", "rgba(0, 191, 165, 0.1)"]}
+        style={styles.notificationItem}
+      >
           <View style={styles.top}>
             
             <Text style={styles.datetamp}>
@@ -72,7 +75,7 @@ export default function Notifications() {
                 item.read ? styles.readButtonRead : styles.readButtonUnread,
               ]}
             >
-              <Text style={{color:"white"}}>{item.read ? "Read" : "Mark as Read"}</Text>
+              <Text style={{color:"#003366"}}>{item.read ? "Read" : "Mark as Read"}</Text>
             </Pressable>
           </View>
           <Text style={styles.title}>{item.title}</Text>
@@ -88,12 +91,15 @@ export default function Notifications() {
               hour12: true,
             })}
           </Text>
-        </View>
+          </LinearGradient>
       );
     } else {
       return (
-        <View style={styles.notificationItem}>
-          <View style={styles.top}>
+        <LinearGradient
+        colors={["rgba(0, 51, 102, 0.1)", "rgba(0, 191, 165, 0.1)"]}
+        style={styles.notificationItem}
+      >
+       <View style={styles.top}>
             
             <Text style={styles.datetamp}>
               {new Date(item.date).toLocaleDateString("en-US", {
@@ -109,7 +115,7 @@ export default function Notifications() {
                 item.read ? styles.readButtonRead : styles.readButtonUnread,
               ]}
             >
-              <Text style={{color:"white"}}>{item.read ? "Read" : "Mark as Read"}</Text>
+              <Text style={{color:"#003366"}}>{item.read ? "Read" : "Mark as Read"}</Text>
             </Pressable>
           </View>
           <Text style={styles.title}>
@@ -127,7 +133,7 @@ export default function Notifications() {
               hour12: true,
             })}
           </Text>
-        </View>
+        </LinearGradient>
       );
     }
   };
@@ -155,20 +161,17 @@ export default function Notifications() {
           }}
           numberOfLines={1}
         >
-          Schedule Management
+          Notifications
         </Text>
       </View>
-      <LinearGradient
-        colors={["rgba(0, 51, 102, 0.2)", "rgba(0, 191, 165, 0.2)"]}
-        style={styles.notificationcontainer}
-      >
+      
         <FlatList
           data={notifications}
           renderItem={renderNotification}
           keyExtractor={(item) => item.id}
           ListEmptyComponent={<Text>No notifications available.</Text>}
         />
-      </LinearGradient>
+ 
     </View>
   );
 }
@@ -230,8 +233,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 0,
     righ: 10,
-    backgroundColor: "#003366",
-    color:'white',
+    backgroundColor: "white",
     paddingHorizontal: 15,
   },
   readButtonUnread: {
@@ -239,7 +241,7 @@ const styles = StyleSheet.create({
     top: 0,
     righ: 10,
     paddingHorizontal: 10,
-    backgroundColor: "#003366",
+    backgroundColor: "white",
   },
   notificationcontainer: {
     top:10,

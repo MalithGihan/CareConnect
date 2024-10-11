@@ -5,6 +5,7 @@ import { useSelector, useDispatch } from "react-redux";
 import CommonNavBtn from "../../Components/CommonNavBtn";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 
+
 export default DProfile = ({ navigation }) => {
   const dispatch = useDispatch();
   const userData = useSelector((state) => state.auth.userData);

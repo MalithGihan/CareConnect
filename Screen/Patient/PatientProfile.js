@@ -2,7 +2,6 @@ import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import React from "react";
 import { logout } from "../../utils/actions/authActions";
 import { useSelector, useDispatch } from "react-redux";
-import CustomButton from "../Login/CustomButton";
 import CommonNavBtn from "../../Components/CommonNavBtn";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { ScrollView } from "react-native-gesture-handler";

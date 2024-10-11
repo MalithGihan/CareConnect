@@ -1,18 +1,22 @@
-// PatientRecords.js
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, TouchableOpacity, TextInput, StyleSheet, Alert } from 'react-native';
 import {
   getMedicalReports,
   addMedicalReport,
   updateMedicalReport,
-  deleteMedicalReport,
+  deleteMedicalReport, 
 } from '../../utils/actions/reportAction'; 
+import { useSelector } from "react-redux";
 
-const PatientRecords = ({ route, navigation }) => {
-  const { patient } = route.params;
+const PatientRecords = ({ route, navigation, loggedInDoctor }) => {
+  const { patient } = route.params; 
   const [medicalReports, setMedicalReports] = useState([]);
   const [reportInput, setReportInput] = useState('');
+  const [medications, setMedications] = useState('');
+  const [notes, setNotes] = useState('');
+  const [treatment, setTreatment] = useState('');
   const [editingIndex, setEditingIndex] = useState(null);
+  const userData = useSelector((state) => state.auth.userData);
 
   useEffect(() => {
     const fetchReports = async () => {
@@ -27,24 +31,34 @@ const PatientRecords = ({ route, navigation }) => {
     fetchReports();
   }, [patient.id]);
 
+  const getCurrentTime = () => {
+    return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
+
   const handleAddReport = async () => {
     if (reportInput.trim() === '') {
-      Alert.alert('Please enter a report');
+      Alert.alert('Please enter a diagnosis');
       return;
     }
 
     const newReport = {
-      reportId: Date.now().toString(), // Unique ID
-      doctorName: 'Dr. John Doe', // Replace with actual doctor name if available
+      reportId: Date.now().toString(), 
+      doctorName: userData.fullName, 
       diagnosis: reportInput.trim(),
-      treatment: 'Treatment details', // You can add a field for treatment input
-      date: new Date().toISOString(),
+      medications: medications.trim(),
+      treatment: treatment.trim(),
+      notes: notes.trim(),
+      time: getCurrentTime(), 
+      date: new Date().toISOString(), 
     };
 
     try {
       await addMedicalReport(patient.id, newReport);
       setMedicalReports([...medicalReports, newReport]);
       setReportInput('');
+      setMedications('');
+      setNotes('');
+      setTreatment('');
     } catch (error) {
       console.error('Error adding medical report:', error);
     }
@@ -58,8 +72,13 @@ const PatientRecords = ({ route, navigation }) => {
 
     const updatedReport = {
       ...medicalReports[editingIndex],
+      doctorName: loggedInDoctor, 
       diagnosis: reportInput.trim(),
-      date: new Date().toISOString(),
+      medications: medications.trim(),
+      treatment: treatment.trim(),
+      notes: notes.trim(),
+      time: getCurrentTime(), 
+      date: new Date().toISOString(), 
     };
 
     try {
@@ -68,6 +87,9 @@ const PatientRecords = ({ route, navigation }) => {
       updatedReports[editingIndex] = updatedReport;
       setMedicalReports(updatedReports);
       setReportInput('');
+      setMedications('');
+      setNotes('');
+      setTreatment('');
       setEditingIndex(null);
     } catch (error) {
       console.error('Error updating medical report:', error);
@@ -75,24 +97,48 @@ const PatientRecords = ({ route, navigation }) => {
   };
 
   const handleDeleteReport = async (index) => {
-    try {
-      await deleteMedicalReport(patient.id, index);
-      const updatedReports = medicalReports.filter((_, i) => i !== index);
-      setMedicalReports(updatedReports);
-    } catch (error) {
-      console.error('Error deleting medical report:', error);
-    }
+    const reportToDelete = medicalReports[index];
+
+    Alert.alert(
+      'Delete Report',
+      'Are you sure you want to delete this report?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await deleteMedicalReport(patient.id, reportToDelete.reportId); 
+              const updatedReports = medicalReports.filter((_, i) => i !== index);
+              setMedicalReports(updatedReports);
+            } catch (error) {
+              console.error('Error deleting medical report:', error);
+            }
+          },
+        },
+      ],
+      { cancelable: true }
+    );
   };
 
   const renderReportItem = ({ item, index }) => (
     <View style={styles.reportItem}>
+      <Text style={styles.reportText}>Doctor: {item.doctorName}</Text>
       <Text style={styles.reportText}>Diagnosis: {item.diagnosis}</Text>
+      <Text style={styles.reportText}>Medications: {item.medications}</Text>
+      <Text style={styles.reportText}>Treatment: {item.treatment}</Text>
+      <Text style={styles.reportText}>Notes: {item.notes}</Text>
+      <Text style={styles.reportText}>Time: {item.time}</Text>
       <Text style={styles.reportText}>Date: {item.date}</Text>
       <View style={styles.reportActions}>
         <TouchableOpacity
           onPress={() => {
             setEditingIndex(index);
             setReportInput(item.diagnosis);
+            setMedications(item.medications);
+            setTreatment(item.treatment);
+            setNotes(item.notes);
           }}
         >
           <Text style={styles.actionText}>Edit</Text>
@@ -113,6 +159,27 @@ const PatientRecords = ({ route, navigation }) => {
         placeholder="Enter diagnosis"
         value={reportInput}
         onChangeText={setReportInput}
+      />
+
+      <TextInput
+        style={styles.input}
+        placeholder="Enter medications"
+        value={medications}
+        onChangeText={setMedications}
+      />
+
+      <TextInput
+        style={styles.input}
+        placeholder="Enter treatment"
+        value={treatment}
+        onChangeText={setTreatment}
+      />
+
+      <TextInput
+        style={styles.input}
+        placeholder="Enter additional notes"
+        value={notes}
+        onChangeText={setNotes}
       />
 
       <TouchableOpacity

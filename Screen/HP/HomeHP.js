@@ -97,9 +97,9 @@ export default function HomeHP() {
           } else if (route.name === PateintReportScannerScreen) {
             iconName = focused ? 'camera' : 'camera-outline'; 
           } else if (route.name === ReportManageScreen) {
-            iconName = focused ? 'document' : 'document-outline';
+            iconName = focused ? 'newspaper' : 'newspaper-outline';
           } else if (route.name === UserCreatescreen) {
-            iconName = focused ? 'medkit' : 'medkit-outline';
+            iconName = focused ? 'person-add' : 'person-add-outline';
           }else if (route.name === ClinicScreen) {
             iconName = focused ? 'medkit' : 'medkit-outline';
           }
@@ -126,13 +126,14 @@ export default function HomeHP() {
 
 const styles = StyleSheet.create({
   tabBar: {
+    position:'absolute',
     paddingBottom: 10,
     paddingHorizontal: 10,
     height: 60,
     marginBottom: 20,
     marginHorizontal: 20,
     borderRadius: 50,
-    backgroundColor: 'white',
+    backgroundColor: '#D9E4EC',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 5 },
     shadowOpacity: 0.3,

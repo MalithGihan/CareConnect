@@ -27,7 +27,6 @@ export default function ViewMedicalHistoryScreen({ route }) {
             ))}
         </View>
     );
-
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Medical History</Text>

@@ -16,6 +16,10 @@ import PatientNotesScreen from './PatientNotesScreen';
 import SeacrchPatients from './SeacrchPatients';
 import AddMedicalRecords from './AddMedicalRecords';
 import PatientRecords from './PatientRecord';
+import PatientActions from './PatientActions';
+import DeleteRecord from './DeleteRecords';
+import ViewAllRecords from './ViewAllmedical';
+import UpdateRecord from './UpdatesMedical';
 
 const DashboardScreen = 'DashboardDoctor'
 const MedicalRecordScreen = 'SearchPatient'
@@ -56,6 +60,11 @@ function AddReportStack() {
       <Stack.Screen name='SearchPatients' component={SeacrchPatients} options={{ headerShown: false }} />
       <Stack.Screen name='Addmedical' component={AddMedicalRecords} options={{ headerShown: false }} />
       <Stack.Screen name="PatientRecords" component={PatientRecords} options={{ headerShown: false }} />
+      <Stack.Screen name="PatientActions" component={PatientActions} options={{ headerShown: false }} />
+      <Stack.Screen name="DeleteRecord" component={DeleteRecord} options={{ headerShown: false }} />
+      <Stack.Screen name="ViewAllRecords" component={ViewAllRecords} options={{ headerShown: false }} />
+      <Stack.Screen name="UpdateRecord" component={UpdateRecord} options={{ headerShown: false }} />
+      
     </Stack.Navigator>
   )
 }
