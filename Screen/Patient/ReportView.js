@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View,TouchableOpacity } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import { getAuth } from 'firebase/auth';
+import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
 
 const ReportView = () => {
   const [userId, setUserId] = useState(null);
+  const navigation = useNavigation();
 
   useEffect(() => {
     const auth = getAuth();
@@ -14,7 +17,7 @@ const ReportView = () => {
     }
   }, []);
 
-  const qrCodeValue = userId ? `user/${userId}/clinicAppointments/` : null;
+  const qrCodeValue = userId ? `user/${userId}/medicalRecords/` : null;
 
   useEffect(() => {
     if (qrCodeValue) {
@@ -25,15 +28,14 @@ const ReportView = () => {
   return (
 
     <View style={styles.container}>
-      {qrCodeValue && (
-        <View style={styles.qrCodeContainer}>
-          <Text style={styles.qrCodeText}>Share Medical History:</Text>
-          <QRCode
-            value={qrCodeValue}
-            size={150}
-          />
-        </View>
-      )}
+        <View style={styles.headerContainer}>
+        <TouchableOpacity
+          onPress={() => navigation.navigate("Dashboard")}
+        >
+          <Ionicons name="arrow-back-circle" size={40} color="#003366" />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Labs Reports</Text>
+      </View>
     </View>
   );
 };
@@ -41,17 +43,20 @@ const ReportView = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
-    backgroundColor: '#fff',
+    backgroundColor: "#D9E4EC",
+    padding: 15,
   },
-  qrCodeContainer: {
-    marginTop: 20,
-    alignItems: 'center',
+  headerContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 25,
   },
-  qrCodeText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 8,
+  headerTitle: {
+    fontSize: 20,
+    marginLeft: 15,
+    color: "#003366",
+    flex: 1,
+    fontWeight: "900",
   },
 });
 

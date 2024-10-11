@@ -34,8 +34,9 @@ export default function DateSlots() {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
-    height: '100%',
+    flex: 1,
+    backgroundColor: "#D9E4EC",
+    padding: 15,
   },
   toggleContainer: {
     flexDirection: 'row',
@@ -43,22 +44,26 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   toggleButton: {
-    padding: 15,
-    borderRadius: 5,
-    width: '40%',
+    paddingHorizontal: 20,
+    paddingVertical: 8,
+    borderRadius: 50,
     alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 5,
   },
   activeButton: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#00BFA5',
   },
   inactiveButton: {
-    backgroundColor: '#ddd',
+    backgroundColor: '#003366',
   },
   buttonText: {
     color: '#fff',
     fontWeight: 'bold',
-  },
-  delete: {
-
   },
 });

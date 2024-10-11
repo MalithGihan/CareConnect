@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, FlatList, TouchableOpacity, TextInput } from 'r
 import { Calendar } from 'react-native-calendars';
 import Toast from 'react-native-toast-message';
 import { getDateSlots, getPatientsByClinicDate, sendUserNotification, deleteClinicDateAndAppointments, recordCancellation } from '../../../utils/actions/userActions';
+import CommonNavBtn from '../../../Components/CommonNavBtn';
 import { useFocusEffect } from '@react-navigation/native';
 
 const ClinicSlotDelete = () => {
@@ -111,11 +112,12 @@ const ClinicSlotDelete = () => {
         markedDates={markedDates}
         style={styles.calendar}
       />
-      {loading && <Text>Loading...</Text>}
+      {loading && <Text style={{textAlign:'center',margin:20,flex:1,fontWeight:'600'}}>Loading...</Text>}
       {patients.length > 0 ? (
         <View style={styles.list}>
         <FlatList 
           data={patients}
+          contentContainerStyle={{marginBottom:50,backgroundColor:'white',borderRadius:20,padding:10}}
           keyExtractor={(patient) => patient.id}
           renderItem={({ item }) => (
             <Text style={styles.patientItem}>
@@ -136,9 +138,10 @@ const ClinicSlotDelete = () => {
         />
       ) : null}
       {selectedDate ? (
-        <TouchableOpacity style={styles.cancelButton} onPress={handleCancelClinicDate}>
-          <Text style={styles.cancelButtonText}>Cancel Clinic Date</Text>
-        </TouchableOpacity>
+        <CommonNavBtn onPress={handleCancelClinicDate}
+        title= "Cancel Clinic Date"
+        style={{ backgroundColor: "red" }}
+        />
       ) : null}
       <Toast />
     </View>
@@ -149,17 +152,19 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     marginBottom:20,
-    backgroundColor: '#f5f5f5',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
   },
   calendar: {
-    marginBottom: 20,
-    borderWidth: 1,
-    borderColor: '#ddd',
+    alignSelf: "center",
+    padding: 10,
+    borderRadius: 20,
+    backgroundColor: "white",
+    width: "95%", 
+    shadowColor: "#000",
+    shadowOffset: { width: 2, height: 5 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 5,
+    marginVertical: 10, 
   },
   list:{
     height:80
@@ -173,7 +178,6 @@ const styles = StyleSheet.create({
   patientItem: {
     fontSize: 16,
     padding: 10,
-    borderBottomWidth: 1,
     borderBottomColor: '#ccc',
   },
   cancelButton: {
@@ -188,11 +192,10 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   reasonInput: {
-    borderWidth: 1,
-    borderColor: '#ccc',
+    marginVertical: 8,
+    backgroundColor: "white",
     borderRadius: 5,
     padding: 10,
-    marginTop: 10,
   },
 });
 export default ClinicSlotDelete;

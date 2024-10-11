@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, TouchableOpacity, FlatList } from 'react-native
 import { Calendar } from 'react-native-calendars';
 import Toast from 'react-native-toast-message';
 import { CreateDateSlots, getDateSlots } from '../../../utils/actions/userActions';
+import { ScrollView } from 'react-native-web';
 
 const ClinicDateCreate = () => {
   const [selectedDate, setSelectedDate] = useState('');
@@ -127,6 +128,7 @@ const ClinicDateCreate = () => {
 
   return (
     <View style={styles.container}>
+      
       <Calendar
         onDayPress={onDayPress}
         markedDates={markedDates}
@@ -139,10 +141,11 @@ const ClinicDateCreate = () => {
       >
         <Text style={styles.buttonText}>Add All Time Slots</Text>
       </TouchableOpacity>
-      {loading && <Text>Loading...</Text>}
+      {loading && <Text style={{textAlign:'center',margin:20,flex:1,fontWeight:'600'}}>Loading...</Text>}
       {availableTimeSlots.length > 0 ? (
         <FlatList
           data={availableTimeSlots}
+          contentContainerStyle={{backgroundColor:'white',padding:15,marginBottom:100,marginTop:20}}
           keyExtractor={(item, index) => index.toString()}
           renderItem={({ item }) => {
             console.log("Rendering Time Slot:", item);
@@ -157,6 +160,7 @@ const ClinicDateCreate = () => {
         selectedDate && <Text style={styles.noSlotsText}>No time slots available for this date.</Text>
       )}
       <Toast />
+    
     </View>
   );
 };
@@ -164,25 +168,40 @@ const ClinicDateCreate = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
-    backgroundColor: '#f5f5f5',
+    padding: 15,
   },
   calendar: {
-    marginBottom: 20,
-    borderWidth: 1,
-    borderColor: '#ddd',
+    alignSelf: "center",
+    padding: 10,
+    borderRadius: 20,
+    backgroundColor: "white",
+    width: "95%", 
+    shadowColor: "#000",
+    shadowOffset: { width: 2, height: 5 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 5,
+    marginBottom:20 
   },
   button: {
-    backgroundColor: '#4CAF50',
-    padding: 15,
-    borderRadius: 5,
-    marginBottom: 20,
+    backgroundColor:'#003366',
+      paddingVertical: 8,
+      borderRadius: 50,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginTop: 20,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 5 },
+      shadowOpacity: 0.3,
+      shadowRadius: 5,
+      elevation: 5,
   },
   buttonText: {
     color: 'white',
     textAlign: 'center',
     fontSize: 16,
     fontWeight: 'bold',
+    paddingVertical:5
   },
   timeSlot: {
     fontSize: 16,

@@ -7,6 +7,7 @@ import Dashboard from './DashboardPatient';
 
 import Patient_Profile from './PatientProfile';
 import QucickTreatment from './QuickTreatment';
+import QRcode from './QRcode';
 
 import Report from './ReportView';
 import Shedules from './SheduleView';
@@ -38,6 +39,7 @@ function MedicalHistoryStack() {
   return (
     <Stack.Navigator>
       <Stack.Screen name='Medical History' component={Medical_History} options={{ headerShown: false }} />
+      <Stack.Screen name='QRCode' component={QRcode} options={{ headerShown: false }} />
     </Stack.Navigator>
   )
 }

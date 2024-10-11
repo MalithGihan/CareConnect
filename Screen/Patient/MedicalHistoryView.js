@@ -1,101 +1,223 @@
-import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, FlatList, TouchableOpacity, Pressable, Alert } from 'react-native';
-import { fetchAppointments } from '../../utils/actions/userActions';
-import Ionicons from "@expo/vector-icons/Ionicons";
+import React, { useEffect, useState, useRef } from "react";
+import {
+  StyleSheet,
+  Text,
+  View,
+  FlatList,
+  TextInput,
+  TouchableOpacity,
+  Alert,
+} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { useSelector } from "react-redux";
-import { useNavigation, useFocusEffect } from "@react-navigation/native";
-import { getUserNotifications } from '../../utils/actions/userActions'; 
+import { useNavigation } from "@react-navigation/native";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import { getMedicalReports } from "../../utils/actions/reportAction";
+import AntDesign from "@expo/vector-icons/AntDesign";
+import { LinearGradient } from "expo-linear-gradient";
+
 
 export default function MedicalHistoryView() {
-  const [appointments, setAppointments] = useState([]);
-  const [unreadCount, setUnreadCount] = useState(0);
+  const [medicalRecords, setMedicalRecords] = useState([]);
+  const [filteredRecords, setFilteredRecords] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [visibleDate, setVisibleDate] = useState(""); // For showing the currently visible date
   const userData = useSelector((state) => state.auth.userData);
   const navigation = useNavigation();
+  const flatListRef = useRef(null);
+  const [visibleDay, setVisibleDay] = useState("");
+  const [visibleMonth, setVisibleMonth] = useState("");
+  const [visibleYear, setVisibleYear] = useState("");
 
   useEffect(() => {
     if (userData && userData.userId) {
-      fetchUserNotifications(userData.userId);
+      fetchMedicalReports(userData.userId);
     }
   }, [userData]);
 
-  useFocusEffect(
-    React.useCallback(() => {
-      if (userData && userData.userId) {
-        fetchUserNotifications(userData.userId);
-      }
-    }, [userData])
-  );
-
-  useEffect(() => {
-    const fetchData = () => {
-      fetchAppointments(setAppointments);
-    };
-
-    fetchData();
-  }, []);
-
-  const fetchUserNotifications = async (userId) => {
+  const fetchMedicalReports = async (userId) => {
     try {
-      const notifications = await getUserNotifications(userId);
-      const unreadNotifications = notifications.filter(
-        (notification) => !notification.read
-      );
-      setUnreadCount(unreadNotifications.length);
+      const records = await getMedicalReports(userId);
+      setMedicalRecords(records);
+      setFilteredRecords(records);
     } catch (error) {
-      console.error("Error fetching user notifications:", error);
-      Alert.alert("Error", "Failed to fetch notifications. Please try again.");
+      console.error("Error fetching medical records:", error);
+      Alert.alert(
+        "Error",
+        "Failed to fetch medical records. Please try again."
+      );
     }
   };
 
-  const renderAppointmentItem = ({ item }) => (
-    <View style={styles.appointmentItem}>
-      <Text style={styles.dateText}>Date: {item.date}</Text>
-      <Text style={styles.timeText}>Time: {item.time}</Text>
-      <Text style={styles.doctorText}>Doctor: {item.doctor}</Text>
-      {item.doctors_prescription && Object.entries(item.doctors_prescription).map(([key, prescription]) => (
-        <View key={key} style={styles.prescriptionItem}>
-          <Text style={styles.prescriptionDateText}>Prescription Date: {prescription.createdAt}</Text>
-          <Text style={styles.diagnosisText}>Diagnosis: {prescription.diagnosis}</Text>
-          <Text style={styles.medicationsText}>Medications: {prescription.medications}</Text>
-          <Text style={styles.noteText}>Note: {prescription.note}</Text>
-        </View>
-      ))}
-    </View>
-  );
+  const filterRecords = () => {
+    let filtered = medicalRecords;
+
+    if (searchQuery) {
+      filtered = filtered.filter(
+        (record) =>
+          record.doctor.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          record.diagnosis.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          record.medications.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
+    if (selectedDate) {
+      filtered = filtered.filter(
+        (record) =>
+          new Date(record.date).toDateString() ===
+          new Date(selectedDate).toDateString()
+      );
+    }
+
+    setFilteredRecords(filtered);
+  };
+
+  const onDateChange = (event, selectedDate) => {
+    const currentDate = selectedDate || date;
+    setShowDatePicker(false);
+    setSelectedDate(currentDate);
+    filterRecords();
+  };
+
+  const onViewableItemsChanged = ({ viewableItems }) => {
+    if (viewableItems.length > 0) {
+      const firstVisibleItem = viewableItems[0];
+      const recordDate = new Date(firstVisibleItem.item.date);
+
+      const day = recordDate.getDate();
+      const month = recordDate.toLocaleString("default", { month: "long" }); // Get full month name
+      const year = recordDate.getFullYear();
+
+      setVisibleDay(day);
+      setVisibleMonth(month);
+      setVisibleYear(year);
+    }
+  };
+
+  const handleGenerateQRCode = () => {
+    navigation.navigate('QRCode', { medicalReports: filteredRecords });
+  };
+
+  const viewabilityConfig = {
+    itemVisiblePercentThreshold: 50, // This decides when an item is considered visible
+  };
+
+  const renderMedicalRecordItem = ({ item }) => {
+    const recordDate = new Date(item.date);
+
+    const formattedDate = recordDate.toLocaleDateString();
+    const formattedTime = recordDate.toLocaleTimeString();
+
+    return (
+      <LinearGradient
+        colors={["rgba(0, 51, 102, 0.3)", "rgba(0, 191, 165, 0.3)"]}
+        style={styles.appointmentItem}
+      >
+        <Text style={styles.doctorText}>Doctor: {item.doctor}</Text>
+        <Text style={styles.doctorText}>Diagnosis: {item.diagnosis}</Text>
+        <Text style={styles.doctorText}>
+          Medications: {item.medications}
+        </Text>
+        <Text style={styles.doctorText}>Notes: {item.notes}</Text>
+        <Text style={styles.dateText}>
+          Date: {formattedDate} | Time: {formattedTime}
+        </Text>
+      </LinearGradient>
+    );
+  };
 
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
-        <TouchableOpacity onPress={() => navigation.navigate("Dashbord")}>
+        <TouchableOpacity onPress={() => navigation.navigate("Dashboard")}>
           <Ionicons name="arrow-back-circle" size={40} color="#003366" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle} numberOfLines={1}>
-          Medical History
-        </Text>
-        <View style={styles.rightCorner}>
-          <Pressable
-            onPress={() => navigation.navigate("notifications")}
-            style={styles.notificationIcon}
-          >
-            <Ionicons name="notifications-outline" size={24} color="black" />
-            {unreadCount > 0 && (
-              <View style={styles.badge}>
-                <Text style={styles.badgeText}>{unreadCount}</Text>
-              </View>
-            )}
-          </Pressable>
-        </View>
+        <Text style={styles.headerTitle}>Medical History</Text>
       </View>
 
-      {appointments.length > 0 ? (
+      <View style={styles.searchContainer}>
+        <View style={styles.searchContainer2}>
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search by doctor, diagnosis, or medication"
+            value={searchQuery}
+            onChangeText={(text) => {
+              setSearchQuery(text);
+              filterRecords();
+            }}
+          />
+          <AntDesign
+            name="search1"
+            size={24}
+            color="black"
+            style={styles.searchIcon}
+          />
+        </View>
+
+        <TouchableOpacity onPress={() => setShowDatePicker(true)}>
+          <Text style={styles.dateFilter}>
+            {selectedDate
+              ? new Date(selectedDate).toDateString()
+              : "Select Date"}
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      {showDatePicker && (
+        <DateTimePicker
+          value={new Date()}
+          mode="date"
+          display="default"
+          onChange={onDateChange}
+        />
+      )}
+
+      <View style={styles.floatingDate}>
+        <Text style={styles.floatingDateText}>{visibleMonth}</Text>
+        <Text style={styles.floatingDateText}>{visibleYear}</Text>
+      </View>
+
+      <View
+        style={{
+          width: 50,
+          height: 50,
+          backgroundColor: "#00BFA5",
+          borderRadius: 60,
+          margin: 5,
+          shadowColor: "#000",
+          shadowOffset: { width: 2, height: 5 },
+          shadowOpacity: 0.3,
+          shadowRadius: 5,
+          elevation: 5,
+          justifyContent: "center", // Center vertically
+          alignItems: "center", // Center horizontally
+        }}
+      >
+        <Text style={styles.floatingDateText2}>{visibleDay}</Text>
+      </View>
+
+      {filteredRecords.length > 0 ? (
         <FlatList
-          data={appointments}
-          keyExtractor={(item) => item.id}
-          renderItem={renderAppointmentItem}
+          ref={flatListRef}
+          data={filteredRecords}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={renderMedicalRecordItem}
+          onViewableItemsChanged={onViewableItemsChanged}
+          viewabilityConfig={viewabilityConfig}
         />
       ) : (
-        <Text>No appointments available</Text>
+        <Text>No medical records found.</Text>
       )}
+
+<TouchableOpacity
+        style={styles.floatingButton}
+        onPress={handleGenerateQRCode}
+      >
+        <AntDesign name="qrcode" size={40} color="white" />
+      </TouchableOpacity>
+
     </View>
   );
 }
@@ -108,7 +230,6 @@ const styles = StyleSheet.create({
   },
   headerContainer: {
     flexDirection: "row",
-    width: "100%",
     alignItems: "center",
     marginBottom: 25,
   },
@@ -119,38 +240,49 @@ const styles = StyleSheet.create({
     flex: 1,
     fontWeight: "900",
   },
-  rightCorner: {
-    position: "absolute",
-    top: 5,
-    right: 5,
-    zIndex: 1,
+  searchContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 15,
   },
-  notificationIcon: {
-    position: "relative",
-    padding: 5,
-  },
-  badge: {
-    position: "absolute",
-    right: 0,
-    top: 0,
-    backgroundColor: "#FF4136",
-    borderRadius: 9,
-    minWidth: 18,
-    height: 18,
-    justifyContent: "center",
+  searchContainer2: {
+    width: "70%",
+    flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 3,
+    backgroundColor: "white",
+    borderRadius: 50,
+    paddingHorizontal: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 2, height: 5 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 5,
   },
-  badgeText: {
-    color: "white",
-    fontWeight: "bold",
+  searchInput: {
+    flex: 1,
+    padding: 10,
+  },
+  searchIcon: {
+    marginLeft: 10,
+  },
+  dateFilter: {
+    paddingHorizontal: 10,
+    paddingVertical: 20,
+    backgroundColor: "white",
+    borderRadius: 50,
+    color: "#003366",
     fontSize: 11,
-    textAlign: "center",
+    fontWeight: "900",
+    shadowColor: "#000",
+    shadowOffset: { width: 2, height: 5 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 5,
   },
   appointmentItem: {
-    margin:5,
+    margin: 5,
+    marginLeft: 50,
     padding: 15,
-    gap:5,
     backgroundColor: "white",
     borderRadius: 20,
     shadowColor: "#000",
@@ -160,41 +292,44 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   dateText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 8,
-    color: '#0066cc',
-  },
-  timeText: {
-    fontSize: 16,
-    marginBottom: 4,
+    fontSize: 10,
+    fontWeight: "bold",
+    marginTop: 15,
+    color: "#333",
   },
   doctorText: {
     fontSize: 16,
     marginBottom: 8,
+    fontWeight:'700'
   },
-  prescriptionItem: {
-    backgroundColor: '#f0f8ff',
-    padding: 12,
-    marginTop: 8,
-    borderRadius: 6,
+  floatingDate: {
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: 12,
+    marginVertical: 15,
+    zIndex: 999,
   },
-  prescriptionDateText: {
-    fontSize: 15,
-    fontWeight: 'bold',
-    marginBottom: 4,
+  floatingDateText: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#003366",
+    alignSelf: "center",
   },
-  diagnosisText: {
-    fontSize: 15,
-    marginBottom: 4,
+  floatingDateText2: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "white",
   },
-  medicationsText: {
-    fontSize: 15,
-    marginBottom: 4,
-  },
-  noteText: {
-    fontSize: 15,
-    fontStyle: 'italic',
-    color: '#555',
+  floatingButton: {
+    position: 'absolute',
+    bottom: 100,
+    right: 30,
+    width: 60,
+    height: 60,
+    backgroundColor: '#00BFA5',
+    borderRadius: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 5,
   },
 });
