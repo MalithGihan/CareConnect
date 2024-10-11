@@ -26,7 +26,7 @@ headerContainer: {
   marginBottom: 25,
 },
 titleText: {
-  fontSize: 20,
+  fontSize: 25,
   marginTop: 10,
   color: "#003366",
   flex: 1,

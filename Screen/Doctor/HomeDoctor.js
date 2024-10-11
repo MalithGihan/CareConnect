@@ -13,11 +13,19 @@ import Prescription from './Prescription';
 import DeleteNoteScreen from './DeleteNoteScreen';
 import ViewMedicalHistoryScreen from './ViewMedicalHistoryScreen';
 import PatientNotesScreen from './PatientNotesScreen';
+import SeacrchPatients from './SeacrchPatients';
+import AddMedicalRecords from './AddMedicalRecords';
+import PatientRecords from './PatientRecord';
+import PatientActions from './PatientActions';
+import DeleteRecord from './DeleteRecords';
+import ViewAllRecords from './ViewAllmedical';
+import UpdateRecord from './UpdatesMedical';
 
 const DashboardScreen = 'DashboardDoctor'
-const SearchPatientScreen = 'SearchPatient'
+const MedicalRecordScreen = 'SearchPatient'
 const ProfileScreen = 'DProfile'
 const PateintReportScannerScreen = 'QRscanner'
+
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -38,6 +46,7 @@ function QRScanStack() {
   )
 }
 
+
 function AddReportStack() {
   return (
     <Stack.Navigator>
@@ -48,6 +57,14 @@ function AddReportStack() {
       <Stack.Screen name="DeleteNoteScreen" component={DeleteNoteScreen} options={{ headerShown: false }} />
       <Stack.Screen name="ViewMedicalHistoryScreen" component={ViewMedicalHistoryScreen} options={{ headerShown: false }} />
       <Stack.Screen name="PatientNotesScreen" component={PatientNotesScreen} options={{ headerShown: false }} />
+      <Stack.Screen name='SearchPatients' component={SeacrchPatients} options={{ headerShown: false }} />
+      <Stack.Screen name='Addmedical' component={AddMedicalRecords} options={{ headerShown: false }} />
+      <Stack.Screen name="PatientRecords" component={PatientRecords} options={{ headerShown: false }} />
+      <Stack.Screen name="PatientActions" component={PatientActions} options={{ headerShown: false }} />
+      <Stack.Screen name="DeleteRecord" component={DeleteRecord} options={{ headerShown: false }} />
+      <Stack.Screen name="ViewAllRecords" component={ViewAllRecords} options={{ headerShown: false }} />
+      <Stack.Screen name="UpdateRecord" component={UpdateRecord} options={{ headerShown: false }} />
+      
     </Stack.Navigator>
   )
 }
@@ -64,7 +81,7 @@ export default function HomeDoctor() {
             iconName = focused ? 'calendar' : 'calendar';
           } else if (route.name === ProfileScreen) {
             iconName = focused ? 'person' : 'person-outline';
-          } else if (route.name === SearchPatientScreen) {
+          } else if (route.name === MedicalRecordScreen) {
             iconName = focused ? 'medical-outline' : 'medical-outline';
           } else if (route.name === PateintReportScannerScreen) {
             iconName = focused ? 'scan' : 'scan-outline';
@@ -82,7 +99,7 @@ export default function HomeDoctor() {
     >
       <Tab.Screen name={DashboardScreen} component={DashboardStack} />
       <Tab.Screen name={PateintReportScannerScreen} component={QRScanStack} />
-      <Tab.Screen name={SearchPatientScreen} component={AddReportStack} />
+      <Tab.Screen name={MedicalRecordScreen} component={AddReportStack} />
       <Tab.Screen name={ProfileScreen} component={DProfile} />
 
     </Tab.Navigator>

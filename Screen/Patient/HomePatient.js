@@ -62,7 +62,7 @@ function SheduleStack() {
   return (
     <Stack.Navigator>
       <Stack.Screen name='Clinic Shedules' component={Shedules} options={{ headerShown: false }} />
-      <Stack.Screen name={AddNoteScreen} component={AddNotePage} options={{ headerShown: true, title: 'Add Note' }} />
+      <Stack.Screen name={AddNoteScreen} component={AddNotePage} options={{ headerShown: false }} />
       <Stack.Screen name='notifications' component={Notifications} options={{ headerShown: false }} />
     </Stack.Navigator>
   )

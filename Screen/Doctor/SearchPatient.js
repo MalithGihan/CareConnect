@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, FlatList, TouchableOpacity, Button } from 'react-native';
+import { StyleSheet, Text, View, FlatList, TouchableOpacity, Button,Pressable } from 'react-native';
 import { getAuth } from 'firebase/auth';
 import { fetchAppointmentsForToday, updateStatus } from '../../utils/actions/userActions';
 import { useNavigation } from '@react-navigation/native';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 const SearchPatient = () => {
   const [appointments, setAppointments] = useState([]);
@@ -33,9 +34,17 @@ const SearchPatient = () => {
         <Text style={styles.titleText} numberOfLines={1}>
           Medical History Management
         </Text>
+        <View style={styles.rightCorner}>
+          <Pressable
+            onPress={() => navigation.navigate("SearchPatients")}
+            style={styles.notificationIcon}
+          >
+            <Ionicons name="add-circle" size={45} color="#003366" />
+          </Pressable>
+         </View> 
       </View>
 
-      <Text style={styles.subtitle}>Appointments for today:</Text>
+      <Text style={styles.subtitle}>Appointments for today</Text>
       {appointments.length > 0 ? (
         <FlatList
           data={appointments}
@@ -70,6 +79,16 @@ const styles = StyleSheet.create({
     backgroundColor: "#D9E4EC",
     padding: 15,
   },
+  rightCorner: {
+    position: "absolute",
+    top: 0,
+    right: 0,
+    zIndex: 1,
+  },
+  notificationIcon: {
+    position: "relative",
+    padding: 5,
+  },
   headerContainer: {
     flexDirection: "row",
     width: "100%",
@@ -84,16 +103,23 @@ const styles = StyleSheet.create({
     fontWeight: "900",
   },
   subtitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
+    fontSize: 15,
+    fontWeight: "900",
+    color: "#003366",
+    marginBottom: 20,
   },
   appointmentItem: {
-    fontSize: 16,
-    marginBottom: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-    paddingBottom: 5,
+    flexDirection: "colum",
+    justifyContent: "flex-start",
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 20,
+    marginBottom:15,
+    shadowColor: "#000",
+    shadowOffset: { width: 2, height: 5 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 5,
   },
   completed: {
     backgroundColor: 'lightblue',
