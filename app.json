@@ -4,10 +4,10 @@
     "slug": "CareConnect",
     "version": "1.0.0",
     "orientation": "default",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/images/logo.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/images/Untitled-1.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -16,7 +16,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/images/Untitled-1.png",
         "backgroundColor": "#ffffff"
       },
      "permissions": [
@@ -25,7 +25,7 @@
   ]
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/images/Untitled-1.png"
     }
   }
 }
