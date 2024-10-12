@@ -4,6 +4,7 @@ import { getAuth } from 'firebase/auth';
 import { fetchAppointmentsForToday, updateStatus } from '../../utils/actions/userActions';
 import { useNavigation } from '@react-navigation/native';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import CommonNavBtn from '../../Components/CommonNavBtn';
 
 const SearchPatient = () => {
   const [appointments, setAppointments] = useState([]);
@@ -57,10 +58,12 @@ const SearchPatient = () => {
                 <Text>Status: {item.status ? 'Completed' : 'Pending'}</Text>
               </TouchableOpacity>
               {!item.status && (
-                <Button
-                  title="Mark as Completed"
-                  onPress={() => updateStatus(userId, item, setAppointments)}
-                />
+          
+                <CommonNavBtn
+                onPress={() => updateStatus(userId, item, setAppointments)}
+                title="Marks as Completed"
+                style={{ backgroundColor: "#003366" }}
+              />
               )}
             </View>
           )}
