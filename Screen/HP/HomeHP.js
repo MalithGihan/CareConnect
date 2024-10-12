@@ -70,7 +70,7 @@ function ClinicMangementStack() {
   return (
     <Stack.Navigator>
       <Stack.Screen name="Clinic" component={HomeScreenHP} options={{ headerShown: false }} />
-      <Stack.Screen name="ClinicDateSelection" component={ClinicDateSelection} />
+      <Stack.Screen name="ClinicDateSelection" component={ClinicDateSelection}  options={{ headerShown: false }}/>
     </Stack.Navigator>
   );
 }

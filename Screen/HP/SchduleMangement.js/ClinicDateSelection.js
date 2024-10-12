@@ -214,10 +214,10 @@ export default function ClinicDateSelection() {
 
   return (
 <View style={styles.container}>
-  <ScrollView style={styles.scrollContainer} nestedScrollEnabled={true}>
-    <Text style={{ fontSize: 15, marginBottom: 5, fontWeight: "900",color:"#003366" }}>
-      Selected Patients: {selectedPatientIds.length}
-    </Text>
+  
+<View style={styles.header}>
+        <Text style={styles.headerTitle}>Clinic Date Selection</Text>
+      </View>
 
     <Calendar
       onDayPress={onDayPress}
@@ -233,9 +233,7 @@ export default function ClinicDateSelection() {
       style={styles.calendar}
     />
 
-    <Text style={{ fontSize: 15, marginBottom: 5, fontWeight: "900", color: "#003366" }}>
-      Selected Date: {selectedDate}
-    </Text>
+<ScrollView style={styles.scrollContainer} nestedScrollEnabled={true}>
 
     <Text style={{ fontSize: 15, marginBottom: 5, fontWeight: "900", color: "#003366" }}>
       Select Doctor:
@@ -287,7 +285,7 @@ export default function ClinicDateSelection() {
     ))}
 
     <Button
-      title={loading ? "Updating..." : "Update Clinic Date for Selected Patients"}
+      title={loading ? "Updating..." : "Add Clinic Dates"}
       onPress={handleAddClinicDate}
       disabled={!selectedDate || !doctor || !venue || !time || loading}
       style={styles.btn}
@@ -306,9 +304,22 @@ const styles = StyleSheet.create({
       backgroundColor: "#D9E4EC",
       padding: 15,
     },
+    header: {
+      flexDirection: "row",
+      justifyContent: "flex-start",
+      alignItems: "center",
+      backgroundColor: "#D9E4EC",
+    },
+    headerTitle: {
+      fontSize: 25,
+      fontWeight: "900",
+      color: "#003366",
+     
+    },
     scrollContainer: {
       flexGrow: 1, 
       paddingBottom: 100, 
+      marginBottom:100
     },
     input: {
       marginVertical: 8,
@@ -331,17 +342,18 @@ const styles = StyleSheet.create({
       marginBottom: 20 
     },
     btn: {
-      paddingHorizontal: 20,
-      paddingVertical: 8,
-      borderRadius: 50,
-      alignItems: 'center',
-      justifyContent: 'center',
-      marginTop: 20,
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 5 },
-      shadowOpacity: 0.3,
-      shadowRadius: 5,
-      elevation: 5,
+     paddingHorizontal: 20,
+    paddingVertical: 8,
+    borderRadius: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 5,
+    borderRadius:20
     },
   });
   
