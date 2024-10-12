@@ -94,7 +94,7 @@ export default UserCreate = () => {
       setError(null);
       Alert.alert("Account Successfully created", "Account created");
       setIsLoading(false);
-      navigation.navigate("Sign In");
+      navigation.navigate("RoleBasedUsers");
     } catch (error) {
       console.log(error);
       setIsLoading(false);
