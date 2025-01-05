@@ -117,6 +117,7 @@ const RoleBasedUsers = (navigate) => {
       ) : (
         <FlatList
           data={filteredUsers}
+          contentContainerStyle={{paddingBottom:100}}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <View style={styles.userItem}>

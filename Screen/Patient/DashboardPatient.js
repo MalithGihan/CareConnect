@@ -138,10 +138,10 @@ export default function DashboardPatient() {
           <FontAwesome5 name="file-medical-alt" size={30} color="#00BFA5" />
             <Text style={styles.mainbtntext}>Lab Reports</Text>
           </Pressable>
-          <Pressable style={[styles.btn]} onPress={() => navigation.navigate("")}>
+          {/* <Pressable style={[styles.btn]} onPress={() => navigation.navigate("")}>
           <MaterialCommunityIcons name="car-emergency" size={30} color="#00BFA5" />
             <Text style={styles.mainbtntext}>Emeargancy Pickup</Text>
-          </Pressable>
+          </Pressable> */}
         </View>
       </ScrollView>
     </View>
