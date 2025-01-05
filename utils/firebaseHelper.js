@@ -9,7 +9,10 @@ export const getFirebaseApp = () => {
         return firebaseApp;
     }
 
-    //Your firebase config here 
+    const firebaseConfig = {
+       //add fire base api
+    };
+
 
     const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 
